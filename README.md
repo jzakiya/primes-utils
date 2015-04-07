@@ -102,7 +102,7 @@ Can change SP PG used on input. Acceptable primes range: [3 - 19].
 ```
 1000000.primenth => 15485863
 1500000.nthprime => 23879519
-2000000.nthprime 13 => 32452843l
+2000000.nthprime 13 => 32452843
 -500000.nthprime => 7368787
 0.nthprime => 0
 ```
