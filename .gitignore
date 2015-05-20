@@ -7,3 +7,8 @@
 /pkg/
 /spec/reports/
 /tmp/
+*.gem
+.directory
+*.odt
+*.odt#
+*.pdf
