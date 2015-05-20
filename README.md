@@ -54,7 +54,11 @@ The method's reliability can be increased by increasing the default input parame
 1.prime? => false
 ```
 
+<<<<<<< HEAD
 **factors(p=13) or prime_division(p=13)**
+=======
+**factors(p=13) or prime division(p=13)**
+>>>>>>> 905fe86436b63568c35a2a392936a19218ed08dd
 
 Determine the prime factorization of the absolute value of an integer.
 This replaces the `prime division` method in the `prime.rb` standard library.
@@ -124,9 +128,18 @@ Jabari Zakiya
 ## References
 [1]https://www.scribd.com/doc/150217723/Improved-Primality-Testing-and-Factorization-in-Ruby-revised
 [2]https://www.scribd.com/doc/228155369/The-Segmented-Sieve-of-Zakiya-SSoZ
+<<<<<<< HEAD
 [3]https://www.scribd.com/doc/73385696/The-Sieve-of-Zakiya  
 [4]https://en.wikipedia.org/wiki/GNU_Core_Utilities  
 [5]https://en.wikipedia.org/wiki/Factor_(Unix)
 
 ## License
 GPL 2.0 or later.
+=======
+[3]https://www.scribd.com/doc/73385696/The-Sieve-of-Zakiya
+[4]https://en.wikipedia.org/wiki/GNU_Core_Utilities
+[5]https://en.wikipedia.org/wiki/Factor_(Unix)
+
+## License
+GPL 2.0 or later.
+>>>>>>> 905fe86436b63568c35a2a392936a19218ed08dd
