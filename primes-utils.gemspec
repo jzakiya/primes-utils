@@ -10,14 +10,15 @@ Gem::Specification.new do |spec|
   spec.email         = ["jzakiya@gmail.com"]
 
   spec.summary       = %q{suite of extremely fast utility methods for testing and generating primes}
-  spec.description   = %q{Methods: prime?, primemr?, primes, nthprime/primenth, factors/prime_division}
+  spec.description   = %q{Methods: prime?, primemr?, primes, primesf, primesmr, primescnt, primescntf, primescntmr, nthprime/primenth, factors/prime_division}
   spec.homepage      = "https://github.com/jzakiya/primes-utils"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.license       = "GPL-2.0"
+  spec.license       = "GPLv2+"
+  spec.required_ruby_version = ">= 1.8.7"
 
   #if spec.respond_to?(:metadata)
   #  spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server."

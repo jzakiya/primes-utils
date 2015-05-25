@@ -1,5 +1,5 @@
 require "primes/utils/version"
-require 'rational' if RUBY_VERSION =~ /^(1.8)/   # for 'gcd' method
+require "rational" if RUBY_VERSION =~ /^(1.8)/   # for 'gcd' method
 
 module Primes
   module Utils
@@ -32,7 +32,7 @@ module Primes
       end
 
       def primesf(start_num=0)
-        # Find primes between a number range: end_num - start_num
+        # Find primes within a number range: end_num - start_num
         # Uses 'prime?' to check primality of prime candidates in range
         sozdata = sozcore1(self, start_num, true) # true for primes
         return sozdata[1] if sozdata[0]
@@ -46,7 +46,7 @@ module Primes
       end
 
       def primescntf(start_num=0)
-        # Count primes between a number range: end_num - start_num
+        # Count primes within a number range: end_num - start_num
         # Uses 'prime?' to check primality of prime candidates in range
         sozdata = sozcore1(self, start_num, false) # false for primescnt
         return sozdata[1] if sozdata[0]
@@ -100,7 +100,7 @@ module Primes
       def factors(p=13)
         # Return prime factors of n in form [[p1,e1],[p2.e2]..[pn.en]]
         # Uses sozP13 Sieve of Zakiya (SoZ) as default Prime Generator
-        seeds  = [2, 3, 5, 7, 11, 13, 17, 19]
+        seeds = [2, 3, 5, 7, 11, 13, 17, 19]
         p = 13 if !seeds.include? p
 
         primes = seeds[0..seeds.index(p)]
@@ -133,17 +133,17 @@ module Primes
     # Replace slow ruby library method prime_division with faster version
     alias  prime_division  factors
 
-    def primenth(p=11)
+    def primenth(p=7)
       # Return value of nth prime
-      # Uses sozP11 Sieve of Zakiya (SoZ) as default Prime Generator
-      seeds  = [2, 3, 5, 7, 11, 13, 17, 19]
-      primes = []
+      # Uses sozP7 Sieve of Zakiya (SoZ) as default Prime Generator
+      seeds = [2, 3, 5, 7, 11, 13]
+      p = 7 if !seeds.include? p
 
       n = self.abs                  # the desired nth prime
       return n != 0 ? seeds[n-1] : 0  if n <= seeds.size
       
-      start_num, nth, nthflag = set_start_value(n)
-      return start_num if nthflag   # nthprime val for reference nth
+      start_num, nth, nthflag = set_start_value(n, nths)
+      return start_num if nthflag   # output nthprime if nth ref value
 
       num = approximate_nth(n)      # close approx to nth >= real nth
       primes = seeds[0..seeds.index(p)]
@@ -158,9 +158,11 @@ module Primes
       prmcnt = n > nth ? nth-1 : primes.size
       m=0; r=1; modk = mod*ks       # find number of pcs, m, in ks < start_num
       while modk + residues[r] < start_num; r += 1; m +=1 end
+      pcnt = prmcnt + prms[m..-1].count(1)  # number of primes upto nth approx
+      return "#{pcnt} not enough primes, nth approx too small" if pcnt < n
       while prmcnt < n; prmcnt +=1 if prms[m] == 1; m +=1 end
-      k,rr = (m+pcs2ks).divmod rescnt
-      mod*k + residues[rr]
+      k, r = (m+pcs2ks).divmod rescnt
+      mod*k + residues[r]
     end
 
     alias  nthprime  primenth       # to make life easier
@@ -242,7 +244,7 @@ module Primes
     end
 
     def primesmr(start_num=0)
-      # Find primes between a number range: end_num - start_num
+      # Find primes within a number range: end_num - start_num
       # Uses 'primemr' to check primality of prime candidates in range
       sozdata = sozcore1(self, start_num, true)  # true for primes
       return sozdata[1] if sozdata[0]
@@ -256,7 +258,7 @@ module Primes
     end
 
     def primescntmr(start_num=0)
-      # Count primes between a number range: end_num - start_num
+      # Count primes within a number range: end_num - start_num
       # Uses 'primemr' to check primality of prime candidates in range
       sozdata = sozcore1(self, start_num, false) # false for primescnt
       return sozdata[1] if sozdata[0]
@@ -331,7 +333,7 @@ module Primes
       sqrtN = Math.sqrt(num).to_i   # sqrt of end_num (end of range)
       pcs2sqrtN = pcs_to_num(sqrtN,mod,rescnt,residues) # num of pcs <= sqrtN
 
-      ks = (start_num-2).abs/mod    # start_num's resgroup values
+      ks = (start_num-2).abs/mod    # start_num's resgroup value
       maxpcs = maxprms              # if ks = 0 use this for prms array
       if ks > 0                     # if start_num > mod+1
 	maxpcs = pcs2sqrtN          # find primes in pcs upto sqrtN
@@ -345,16 +347,8 @@ module Primes
       pos =[]; rescnt.times {|i| pos[residues[i]] = i-1}
 
       # Sieve of Zakiya (SoZ) to eliminate nonprimes from prms and prms_range
-      sozsieve(pcs2sqrtN, rescnt, residues, mod, pos,
-               ks, maxpcs, max_range, prms, prms_range)
-
-      [ks, mod, residues, maxprms, max_range, prms, prms_range]
-    end
-
-    def sozsieve(n,rescnt,residues,mod,pos,ks,maxpcs,max_range,prms,prms_range)
-      pcs2ks = rescnt*ks            # number of pcs upto ks resgroup
       modk,r,k=0,0,0
-      n.times do |i|                # sieve primes from pcs upto sqrt(end_num)
+      pcs2sqrtN.times do |i|        # sieve primes from pcs upto sqrt(end_num)
         r +=1; if r > rescnt; r=1; modk +=mod; k +=1 end
 	next unless prms[i]==1
         res_r = residues[r]
@@ -372,28 +366,38 @@ module Primes
 	  end
         end
       end
+      [ks, mod, residues, maxprms, max_range, prms, prms_range]
     end
 
     def approximate_nth(n, b=0.686) # approximate nthprime value >= real value
+      b=0.6863 if n > 1064000000    # good upto nth <= 1122951705
       a = b*(Math.log(Math.log(n)))
       (n*(Math.log(n)+a)+1).to_i
     end
 
-    def set_start_value(n)          # find closest nth|nthprime val <= requested 
-      nths = {1000000 => 15485863, 5000000 =>   86028121,   7500000 =>  132276691,
-         10000000 =>  179424673,  12500000 =>  227254201,  25000000 =>  472882027, 
-         37500000 =>  725420401,  50000000 =>  982451653,  61250000 => 1216635319,
+    def set_start_value(n, nths)    # find closest nth|nthprime val <= requested 
+      nthkeys = nths.keys.sort
+      return [nths[n], 0, true] if nthkeys.include? n   # if nth in nths table
+      start_num, nth = 0, nthkeys[0]
+      nthkeys.each {|i| start_num, nth = nths[i], i if n > i}
+      [start_num, nth, false]
+    end
+
+    def nths                        # hash table index of reference nth primes
+      nths={1000000 => 15485863,   5000000 =>   86028121,   7500000 =>  132276691,
+         10000000 =>  179424673,  12500000 =>  227254201,  25000000 =>  472882027,
+         37500000 =>  725420401,  50000000 =>  982451653,  62500000 => 1242809749,
          75000000 => 1505776939,  87500000 => 1770989609, 100000000 => 2038074743,
-        112500000 => 2306797469, 125000000 => 2576983867, 137500000 => 2848518523, 
+        112500000 => 2306797469, 125000000 => 2576983867, 137500000 => 2848518523,
         150000000 => 3121238909, 162500000 => 3395057291, 175000000 => 3669829403,
         187500000 => 3945592087, 200000000 => 4222234741, 212500000 => 4499683009,
         225000000 => 4777890881, 237500000 => 5056862311, 250000000 => 5336500537,
         262500000 => 5616787769, 275000000 => 5897707297, 287500000 => 6179208157,
         300000000 => 6461335109, 312500000 => 6743943629, 325000000 => 7027107881,
         337500000 => 7310793337, 350000000 => 7594955549, 362500000 => 7879581839,
-        375000000 => 8184628191, 387500000 => 8450100349, 400000000 => 8736028057,
+        375000000 => 8164628191, 387500000 => 8450100349, 400000000 => 8736028057,
         412500000 => 9022375487, 425000000 => 9309109471, 437500000 => 9596238593,
-        450000000 => 8736028057, 462500000 =>10171564687, 475000000 =>10459805417,
+        450000000 => 9883692017, 462500000 =>10171564687, 475000000 =>10459805417,
         487500000 =>10748372137, 500000000 =>11037271757, 512500000 =>11326513039,
         525000000 =>11616020609, 537500000 =>11905863799, 550000000 =>12196034771,
         562500000 =>12486465863, 575000000 =>12777222833, 587500000 =>13068237251,
@@ -401,23 +405,21 @@ module Primes
         637500000 =>14235122851, 650000000 =>14527476781, 662500000 =>14820071503,
         675000000 =>15112928683, 687500000 =>15406031899, 700000000 =>15699342107,
         712500000 =>15992957251, 725000000 =>16286768243, 737500000 =>16580801137,
-        750000000 =>16875026921, 787500000 =>17759139259, 800000000 =>18054236957,
-        812500000 =>18349591409, 825000000 =>18645104897, 837500000 =>18940846207,
-        850000000 =>19236701629, 862500000 =>19532780327, 875000000 =>19829092147,
-        887500000 =>20125592731, 900000000 =>20422213579, 912500000 =>20719050323,
-        925000000 =>21016060633, 937500000 =>21313231963, 950000000 =>21610588367,
-        962500000 =>21908128993, 975000000 =>22205818561, 987500000 =>22503733657,
-        1000000000=>22801763489, 1012500000=>23099993743, 1025000000=>23398391231
+        750000000 =>16875026921, 762500000 =>17169527171, 775000000 =>17464243799,
+        787500000 =>17759139259, 800000000 =>18054236957, 812500000 =>18349591409,
+        825000000 =>18645104897, 837500000 =>18940846207, 850000000 =>19236701629,
+        862500000 =>19532780327, 875000000 =>19829092147, 887500000 =>20125592731,
+        900000000 =>20422213579, 912500000 =>20719050323, 925000000 =>21016060633,
+        937500000 =>21313231963, 950000000 =>21610588367, 962500000 =>21908128993,
+        975000000 =>22205818561, 987500000 =>22503733657, 1000000000=>22801763489,
+        1012500000=>23099993743, 1025000000=>23398391231, 1037500000=>23696858797,
+        1050000000=>23995554823, 1062500000=>24294392179, 1075000000=>24593421187,
+        1087500000=>24892587403, 1100000000=>25191867719, 1112500000=>25491361037
       }
-      nthkeys = nths.keys.sort
-      return [nths[n], 0, true] if nthkeys.include? n
-      start_num, nth = 0, nthkeys[0]
-      nthkeys.each {|i| start_num, nth = nths[i], i if n > i}
-      [start_num, nth, false]
     end
   end
 end
 
 class Integer; include Primes::Utils end
   
-puts "Available methods are: #{0.primes_utils}"
+puts "Available methods are: #{0.primes_utils}"  # display methods upon loading
