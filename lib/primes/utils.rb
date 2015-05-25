@@ -169,11 +169,11 @@ module Primes
 
     def primes(start_num=0)
       # Find primes between a number range: end_num - start_num
-      # Uses the P13 Strictly Prime (SP) Prime Generator
+      # Uses the P5 Strictly Prime (SP) Prime Generator
       num = self.abs;  start_num = start_num.abs
       num, start_num = start_num, num  if start_num > num
 
-      primes = [2,3,5,7,11,13]      # P13 excluded primes lists
+      primes = [2,3,5]              # P5 excluded primes lists
       plast  = primes.last          # last prime in primes
       return primes.select {|p| p >= start_num && p <= num} if num <= plast
 
@@ -196,11 +196,11 @@ module Primes
     
     def primescnt(start_num=0)
       # Count primes between a number range: end_num - start_num
-      # Uses the P13 Strictly Prime (SP) Prime Generator
+      # Uses the P5 Strictly Prime (SP) Prime Generator
       num = self.abs;  start_num = start_num.abs
       num, start_num = start_num, num  if start_num > num
 
-      primes = [2,3,5,7,11,13]      # P13 excluded primes lists
+      primes = [2,3,5]              # P5 excluded primes lists
       plast  = primes.last          # last prime in primes
       return primes.select {|p| p >= start_num && p <= num}.size if num <= plast
 
