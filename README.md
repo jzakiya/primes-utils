@@ -66,8 +66,8 @@ The reliability can be increased by increasing the default input parameter of k=
 **factors(p=13) or prime_division(p=13)**
 
 Determine the prime factorization of the absolute value of an integer.
-This replaces the `prime division` method in the `prime.rb` standard library.
-Output is array of arrays of factors and exponents: [[p1,e1],[p2,e2]..[pn,en]]
+This replaces the `prime_division` method in the `prime.rb` standard library.
+Output is array of arrays of factors and exponents: [[p1,e1],[p2,e2]..[pn,en]].
 Default Strictly Prime (SP) Prime Generator (PG) used here is P13.
 Can change SP PG used on input. Acceptable primes range: [3 - 19].
 

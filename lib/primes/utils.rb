@@ -1,5 +1,7 @@
 require "primes/utils/version"
-require "rational" if RUBY_VERSION =~ /^(1.8)/   # for 'gcd' method
+
+# need rubygems to load gems, and rational for 'gcd' method for 1.8
+%w/rubygems rational/.each{|r| require r} if RUBY_VERSION =~ /^(1.8)/
 
 module Primes
   module Utils
@@ -325,6 +327,16 @@ module Primes
       [false, maxpcs-m, r, mod, modk, rescnt, residues, primes]
     end
 
+    # Perform SoZ for given Prime Generator and return array of parameters
+    # inputs: end_num and start_num of range; excluded primes array for PG
+    # outputs: ks - resgroup value for start_num
+    #          mod - modulus value for PG
+    #          residues  - array of residues plus mod+1 for PG
+    #          maxprms   - number of pcs upto end_num for PG
+    #          max_range - number of pcs from ks resgroup to end_num
+    #          prms - binary (0,1) array of pcs upto sqrt(end_num) or end_num
+    #          prms_range - binary array of pcs from ks resgroup to end_num
+
     def sozcore2(num, start_num, primes)
       mod = primes.reduce(:*)       # modulus: modPn = 2*3*5*7*..*Pn
       residues, rescnt = make_residues_rescnt(mod)
@@ -370,13 +382,13 @@ module Primes
     end
 
     def approximate_nth(n, b=0.686) # approximate nthprime value >= real value
-      b=0.6863 if n > 1064000000    # good upto nth <= 1122951705
+      b=0.6863 if n > 1112500000    # good upto nth <= 1122951705
       a = b*(Math.log(Math.log(n)))
-      (n*(Math.log(n)+a)+1).to_i
+      (n*(Math.log(n)+a)+1).to_i    # nthprime approximation
     end
 
-    def set_start_value(n, nths)    # find closest nth|nthprime val <= requested 
-      nthkeys = nths.keys.sort
+    def set_start_value(n, nths)    # find closest ref nthprime <= requested 
+      nthkeys = nths.keys.sort      # as start_num for range
       return [nths[n], 0, true] if nthkeys.include? n   # if nth in nths table
       start_num, nth = 0, nthkeys[0]
       nthkeys.each {|i| start_num, nth = nths[i], i if n > i}
