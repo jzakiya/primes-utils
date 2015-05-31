@@ -27,7 +27,7 @@ And then execute:
 Or install it yourself as:
 
     $ gem install primes-utils
-    
+
 Then require as:
 
     require 'primes/utils'
@@ -85,7 +85,7 @@ Can change SP PG used on input. Acceptable primes range: [3 - 19].
 **primes(start=0), primesf(start=0), primesmr(start=0)**
 
 Return an array of primes within the absolute value range `(|start| - |end|)`.
-The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`
+The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`.
 If only one parameter used, then all the primes upto that number will be returned.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 
@@ -107,7 +107,7 @@ prms => [1000003, 1000033, 1000037, 1000039, 1000081, 1000099]
 **primescnt(start=0), primescntf(start=0), primescntmr(start=0)**
 
 Provide count of primes within the absolute value range `(|start| - |end|)`.
-The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`
+The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`.
 If only one parameter used, the count of all the primes upto that number will be returned.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 
@@ -140,7 +140,7 @@ An error message will be given if requested nth prime is > than max.
 
 **primes_utils**
 
-Displays a list of all the `primes-utils` methods available for your system. 
+Displays a list of all the `primes-utils` methods available for your system.
 Use as `x.primes_utils` where x is any `class Integer` value.
 
 ```
@@ -153,9 +153,9 @@ The methods `prime?` and `prime_division|factors` have two implementations.
 Each has a pure ruby implementation, and a hybrid implementation using the Unix cli command `factor` if its available on the host OS. 
 The methods `primesf` and `primescntf` use the `factor` version of `prime?` and are created if it exits.
 `factor` [5] is an extremely fast C coded factoring algorithm, part of the GNU Core Utilities package [4].
- 
+
 Upon loading, the gem tests if the command `factor` exists on the host OS.
-If so, it performs a system call to it within `prime?` and `prime_division/factors`, which uses its output. 
+If so, it performs a system call to it within `prime?` and `prime_division/factors`, which uses its output.
 If not, each method uses a fast pure ruby implementation based on the Sieve of Zakiya (SoZ)[1][2][3].
 
 All the `primes-utils` methods are `instance_methods` for `class Integer`.
@@ -170,7 +170,6 @@ Jabari Zakiya
 [4]https://en.wikipedia.org/wiki/GNU_Core_Utilities
 [5]https://en.wikipedia.org/wiki/Factor_(Unix)
 [6]https://en.wikipedia.org/wiki/Miller-Rabin_primality_test
-
 
 ## License
 GPLv2+
