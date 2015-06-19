@@ -127,6 +127,7 @@ n=10**400; (n-500).primescntmr(n+500) => 1
 Return the value of the (absolute value of) nth prime.
 Default Strictly Prime (SP) Prime Generator (PG) used here is P7.
 Can change SP PG used on input. Acceptable primes range: [3 - 13].
+Indexed nth primes now upto 1.6 billionth.
 Also see `Error Handling`.
 
 ```
