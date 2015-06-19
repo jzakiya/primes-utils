@@ -88,6 +88,7 @@ Return an array of primes within the absolute value range `(|start| - |end|)`.
 The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`.
 If only one parameter used, then all the primes upto that number will be returned.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
+Also see `Error Handling`.
 
 ```
 50.primes => [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
@@ -110,6 +111,7 @@ Provide count of primes within the absolute value range `(|start| - |end|)`.
 The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`.
 If only one parameter used, the count of all the primes upto that number will be returned.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
+Also see `Error Handling`.
 
 ```
 100000.primescnt => 9592
@@ -125,8 +127,7 @@ n=10**400; (n-500).primescntmr(n+500) => 1
 Return the value of the (absolute value of) nth prime.
 Default Strictly Prime (SP) Prime Generator (PG) used here is P7.
 Can change SP PG used on input. Acceptable primes range: [3 - 13].
-Currently, parameters are set so that the 1122951705th prime is max.
-An error message will be given if requested nth prime is > than max.
+Also see `Error Handling`.
 
 ```
 1000000.primenth => 15485863
@@ -134,8 +135,8 @@ An error message will be given if requested nth prime is > than max.
 2000000.nthprime 11 => 32452843
 -500000.nthprime => 7368787
 1122951705.nthprime => 25741879847
-1122951706.primenth => "1122951705 not enough primes, nth approx too small"
 0.nthprime => 0
+1.primenth => 2
 ```
 
 **primes_utils**
@@ -147,16 +148,29 @@ Use as `x.primes_utils` where x is any `class Integer` value.
 0.primes_utils => "prime? primemr? primes primesf primesmr primescnt primescntf primescntmr primenth|nthprime factors|prime_division"
 ```
 
+## Error Handling
+Starting with 2.2.0, error handling has been implemented to gracefully handle when array creation requires more memory than available.
+This occurs then the range size, or end_num, need arrays greater than the amount of avalable memory. The first case shows the message
+`ERROR1: range size too big for available memory.` and the second case `ERROR2: end_num too big for available memory.`
+The affected methods are `nthprime|primenth`, `primes`, and `primescnt`.
+`nthprime|primenth` also displays the error message `<yyyy> not enough primes, approx nth too small.` 
+(where <yyyy> is an integer value) when the computed approx_nth value < nth value.
+For all errors, the return value for each method is `nil`.
+
+This behavior is referenced to MRI Ruby.
+
+
 ## Coding Implementations
-The methods `primemr?`, `nthprime/primenth`, `primes`, `primescnt`, `primesmr`, and `primescnt` are coded in pure ruby.
+The methods `primemr?`, `nthprime|primenth`, `primes`, `primescnt`, `primesmr`, and `primescnt` are coded in pure ruby.
 The methods `prime?` and `prime_division|factors` have two implementations.
 Each has a pure ruby implementation, and a hybrid implementation using the Unix cli command `factor` if its available on the host OS. 
 The methods `primesf` and `primescntf` use the `factor` version of `prime?` and are created if it exits.
 `factor` [5] is an extremely fast C coded factoring algorithm, part of the GNU Core Utilities package [4].
 
 Upon loading, the gem tests if the command `factor` exists on the host OS.
-If so, it performs a system call to it within `prime?` and `prime_division/factors`, which uses its output.
+If so, it performs a system call to it within `prime?` and `prime_division|factors`, which uses its output.
 If not, each method uses a fast pure ruby implementation based on the Sieve of Zakiya (SoZ)[1][2][3].
+New in 2.2.0, upon loading with Ruby 1.8 `require 'rubygems'` is invoked to enable installing gems.
 
 All the `primes-utils` methods are `instance_methods` for `class Integer`.
 
