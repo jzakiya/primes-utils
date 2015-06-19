@@ -154,7 +154,7 @@ This occurs then the range size, or end_num, need arrays greater than the amount
 `ERROR1: range size too big for available memory.` and the second case `ERROR2: end_num too big for available memory.`
 The affected methods are `nthprime|primenth`, `primes`, and `primescnt`.
 `nthprime|primenth` also displays the error message `<yyyy> not enough primes, approx nth too small.` 
-(where <yyyy> is an integer value) when the computed approx_nth value < nth value.
+(where `<yyyy>` is an integer value) when the computed approx_nth value < nth value.
 For all errors, the return value for each method is `nil`.
 
 This behavior is referenced to MRI Ruby.
