@@ -151,7 +151,7 @@ Use as `x.primes_utils` where x is any `class Integer` value.
 
 ## Error Handling
 Starting with 2.2.0, error handling has been implemented to gracefully handle when array creation requires more memory than available.
-This occurs then the range size, or end_num, need arrays greater than the amount of avalable memory. The first case shows the message
+This occurs when the range size, or end_num, need arrays greater than the amount of avalable memory. The first case shows the message
 `ERROR1: range size too big for available memory.` and the second case `ERROR2: end_num too big for available memory.`
 The affected methods are `nthprime|primenth`, `primes`, and `primescnt`.
 `nthprime|primenth` also displays the error message `<yyyy> not enough primes, approx nth too small.` 
