@@ -37,8 +37,8 @@ module Primes
         # Find primes within a number range: end_num - start_num
         # Uses 'prime?' to check primality of prime candidates in range
         sozdata = sozcore1(self, start_num, true) # true for primes
-        return sozdata[1] if sozdata[0]
-        pcs_in_range, r, mod, modk, rescnt, residues, primes = sozdata[1..-1]
+        return sozdata[1] if !sozdata[0]          # if sozdata[0] false
+        pcs_in_range, r, mod, modk, rescnt, residues, primes = sozdata
         pcs_in_range.times do         # find primes from this num pcs in range
           prime = modk + residues[r]
 	  primes << prime if prime.prime?
@@ -51,9 +51,9 @@ module Primes
         # Count primes within a number range: end_num - start_num
         # Uses 'prime?' to check primality of prime candidates in range
         sozdata = sozcore1(self, start_num, false) # false for primescnt
-        return sozdata[1] if sozdata[0]
-        pcs_in_range, r, mod, modk, rescnt, residues, primes = sozdata[1..-1]
-        primescnt = primes.size
+        return sozdata[1] if !sozdata[0]           # if sozdata[0] false
+        pcs_in_range, r, mod, modk, rescnt, residues, primescnt = sozdata
+
         pcs_in_range.times do         # count primes from this num pcs in range
 	  primescnt +=1 if (modk + residues[r]).prime?
 	  r +=1; if r > rescnt; r=1; modk +=mod end
@@ -143,25 +143,22 @@ module Primes
 
       n = self.abs                  # the desired nth prime
       return n != 0 ? seeds[n-1] : 0  if n <= seeds.size
-      
-      start_num, nth, nthflag = set_start_value(n)
+
+      start_num, nth, nthflag = set_start_value(n,true)
       return start_num if nthflag   # output nthprime if nth ref value
 
       num = approximate_nth(n)      # close approx to nth >= real nth
       primes = seeds[0..seeds.index(p)]
 
-      prms, m, mod, modk, residues, * = sozcore2(num, start_num, primes)
+      prms, m, mod, modk, residues, rescnt, * = sozcore2(num, start_num, primes)
       return if prms == nil         # exit gracefully if sozcore2 mem error
-      
-      rescnt = residues[1..-1].size
-      pcs2ks = rescnt*(modk/mod)    # rescnt*ks - number of pcs upto ks resgroup
-      
+
       # starting at start_num's location, find nth prime within given range
       prmcnt = n > nth ? nth-1 : primes.size
       pcnt = prmcnt + prms[m..-1].count(1)  # number of primes upto nth approx
       return puts "#{pcnt} not enough primes, approx nth too small." if pcnt < n
       while prmcnt < n; prmcnt +=1 if prms[m] == 1; m +=1 end
-      k, r = (m+pcs2ks).divmod rescnt
+      k, r = (m + rescnt*(modk/mod)).divmod rescnt  # (m+pcs2ks).divmod rescnt
       mod*k + residues[r]
     end
 
@@ -177,13 +174,11 @@ module Primes
       plast  = primes.last          # last prime in primes
       return primes.select {|p| p >= start_num && p <= num} if num <= plast
 
-      prms, m, mod, modk, residues, maxprms, r = sozcore2(num, start_num, primes)
+      prms, m, mod, modk, residues, rescnt, maxprms, r = sozcore2(num, start_num, primes)
       return if prms == nil         # exit gracefully if sozcore2 mem error
 
-      rescnt = residues[1..-1].size
-
       # starting at start_num's location, extract primes within given range
-      primes = start_num <= plast ? primes.drop_while {|p| p < start_num} : []
+      primes = start_num <= plast ? primes.select {|p| p >= start_num} : [] 
       while m < maxprms              # find primes from pcs within given range
 	primes << modk + residues[r] if prms[m] == 1
         r +=1; if r > rescnt; r=1; modk +=mod end
@@ -194,20 +189,27 @@ module Primes
 
     def primescnt(start_num=0)
       # Count primes between a number range: end_num - start_num
-      # Uses the P5 Strictly Prime (SP) Prime Generator
+      # Uses P5 or P7 Strictly Prime (SP) Prime Generators
       num = self.abs;  start_num = start_num.abs
       num, start_num = start_num, num  if start_num > num
 
-      primes = [2,3,5]              # P5 excluded primes lists
-      plast  = primes.last          # last prime in primes
-      return primes.select {|p| p >= start_num && p <= num}.size if num <= plast
+      seeds = [2, 3, 5, 7, 11, 13]
+      plast = seeds.last            # last prime in seeds
+      return seeds.select {|p| p >= start_num && p <= num}.size if num <= plast
 
+      if start_num == 0
+        start_num, nth, nthflag = set_start_value(num,false)
+        return nth if !nthflag      # output nth's number if n a ref nth prime
+      end
+
+      primes = nthflag ? [2,3,5,7] : [2,3,5]  # choose P7 or P5
       prms, m, * = sozcore2(num, start_num, primes)
       return if prms == nil         # exit gracefully if sozcore2 mem error
 
       # starting at start_num's location, count primes within given range
-      primes = start_num <= plast ? primes.drop_while {|p| p < start_num} : []
-      primecnt = primes.size + prms[m..-1].count(1)
+      prmcnt = start_num <= plast ? primes.select {|p| p >= start_num}.size : 0
+      prmcnt = nth > 0 ? nth-1 : primes.size if nthflag  # nflag is nil or true
+      prmcnt + prms[m..-1].count(1)
     end
 
     # Miller-Rabin prime test in Ruby
@@ -242,8 +244,8 @@ module Primes
       # Find primes within a number range: end_num - start_num
       # Uses 'primemr' to check primality of prime candidates in range
       sozdata = sozcore1(self, start_num, true)  # true for primes
-      return sozdata[1] if sozdata[0]
-      pcs_in_range, r, mod, modk, rescnt, residues, primes = sozdata[1..-1]
+      return sozdata[1] if !sozdata[0]           # if sozdata[0] false
+      pcs_in_range, r, mod, modk, rescnt, residues, primes = sozdata
       pcs_in_range.times do         # find primes from this num pcs in range
         prime = modk + residues[r]
 	primes << prime if prime.primemr?
@@ -256,9 +258,9 @@ module Primes
       # Count primes within a number range: end_num - start_num
       # Uses 'primemr' to check primality of prime candidates in range
       sozdata = sozcore1(self, start_num, false) # false for primescnt
-      return sozdata[1] if sozdata[0]
-      pcs_in_range, r, mod, modk, rescnt, residues, primes = sozdata[1..-1]
-      primescnt = primes.size
+      return sozdata[1] if !sozdata[0]           # if sozdata[0] false
+      pcs_in_range, r, mod, modk, rescnt, residues, primescnt = sozdata
+
       pcs_in_range.times do         # count primes from this num pcs in range
 	primescnt +=1 if (modk + residues[r]).primemr?
 	r +=1; if r > rescnt; r=1; modk +=mod end
@@ -301,23 +303,24 @@ module Primes
 
     def sozcore1(num, start_num, method_flag)
       # Uses the P13 Strictly Prime (SP) Prime Generator
-      num = num.abs;  start_num = start_num.abs
+      num = num.abs;   start_num = start_num.abs
       num, start_num = start_num, num  if start_num > num
 
       primes = [2,3,5,7,11,13]      # P13 excluded primes lists
       plast  = primes.last          # last prime in primes              
       if num <= plast
 	primes = primes.select {|p| p >= start_num && p <= num}
-	return [true, method_flag ? primes : primes.size]
+	return [false, method_flag ? primes : primes.size]
       end
       mod = primes.reduce(:*)       # P13 modulus: 2*3*5*7*11*13 = 30030
       residues, rescnt = make_residues_rescnt(mod)
-      maxpcs = pcs_to_num(num,mod,rescnt,residues) # num of pcs <= end_num
+      maxpcs = pcs_to_num(num, mod, rescnt, residues) # num of pcs <= end_num
 
       # compute parameters for start location and number of pcs within range
-      primes = start_num <= plast ? primes.drop_while {|p| p < start_num} : []
+      primes = start_num <= plast ? primes.select {|p| p >= start_num} : [] 
       m, r, modk = pcs_to_start_num(start_num, mod, rescnt, residues)
-      [false, maxpcs-m, r, mod, modk, rescnt, residues, primes]
+
+      [maxpcs-m, r, mod, modk, rescnt, residues, method_flag ? primes : primes.size]
     end
 
     # Perform SoZ for given Prime Generator and return array of parameters
@@ -327,8 +330,9 @@ module Primes
     #          mod  - modulus value for PG
     #          modk - mod*ks; mod value for ks, start_num's resgroup
     #          residues - array of residues plus mod+1 for PG
+    #          rescnt   - number of residues < mod
     #          maxprms  - the number of pcs in range to find primes from
-    #          r    - first residue location in ks >= start_num
+    #          r    - first residue index location in ks >= start_num
 
     def sozcore2(num, start_num, primes)
       mod = primes.reduce(:*)       # modulus: modPn = 2*3*5*7*..*Pn
@@ -384,7 +388,7 @@ module Primes
       r=1; modk = mod*ks                              # find 1st residue val|location
       while modk + residues[r] < start_num; r +=1 end # r in ks >= start_num
 
-      [prms, m=r-1, mod, modk, residues, maxprms, r]  # parameter output
+      [prms, m=r-1, mod, modk, residues, rescnt, maxprms, r]  # parameter output
     end
 
     def approximate_nth(n)          # approximate nthprime value >= real value
@@ -393,12 +397,16 @@ module Primes
       (n*(Math.log(n)+a)+3).to_i    # use nth approximation as end_num of range
     end
 
-    def set_start_value(n)          # find closest index nthprime <= requested nth
-      nthkeys = nths.keys.sort      # create array of indexed nth numbers
-      return [nths[n], 0, true] if nthkeys.include? n  # if n in nths table
-      start_num, nth = 0, nthkeys[0]
-      nthkeys.each {|i| start_num, nth = nths[i], i if n > i}
-      [start_num, nth, false]       # use index prime value as start_num of range
+    def set_start_value(n, hshflag) # find largest index nthprime|val <= requested
+      if hshflag
+        return [nths[n], 0, true] if nths.has_key? n       # if n is key in nths table
+        nth = nths.keys.sort.select {|k| k < n}.last       # find largest indexed key < n
+        [nth ? nths[nth] : 0, nth ||= n+1, false]          # [start_num, nth, false]
+      else
+        return [0,nths.key(n),false] if nths.has_value? n  # if n is value in nths table
+        v=val = nths.values.sort.select {|v| v < n}.last   # find largest indexed val < n
+        [v ||= 0, val ? nths.key(val) : 0, true]           # [start_num, nth, true]
+      end
     end
 
     def nths                        # hash table index of reference nth primes
@@ -445,7 +453,18 @@ module Primes
         1462500000=>33930284893, 1475000000=>34233442279, 1487500000=>34536683891,
         1500000000=>34840062373, 1512500000=>35143545889, 1525000000=>35447088559,
         1537500000=>35750747297, 1550000000=>36054501641, 1562500000=>36358440731,
-        1575000000=>36662430631, 1587500000=>36966563321, 1600000000=>37270791697
+        1575000000=>36662430631, 1587500000=>36966563321, 1600000000=>37270791697,
+        1612500000=>37575137933, 1625000000=>37879532671, 1637500000=>38184009763,
+        1650000000=>38488677419, 1662500000=>38793413899, 1675000000=>39098225629,
+        1687500000=>39403174463, 1700000000=>39708229123, 1712500000=>40013309359,
+        1725000000=>40318523009, 1737500000=>40623800311, 1750000000=>40929166261,
+        1762500000=>41234743751, 1775000000=>41540289619, 1787500000=>41845958971,
+        1800000000=>42151671491, 1812500000=>42457500313, 1825000000=>42763499629,
+        1837500000=>43069571603, 1850000000=>43375710643, 1862500000=>43681898699,
+        1875000000=>43988172667, 1887500000=>44294549347, 1900000000=>44601021791,
+        1912500000=>44907564593, 1925000000=>45214177441, 1937500000=>45520935011,
+        1950000000=>45827700419, 1962500000=>46134655219, 1975000000=>46441643177,
+        1987500000=>46748693981, 2000000000=>47055833459, 2012500000=>47363059687
       }
     end
   end

@@ -114,7 +114,9 @@ See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
 
 ```
-100000.primescnt => 9592
+100001.primescnt => 9592
+100002.primescnt => 9592
+100003.primescnt => 9593
 100000.primescntf 100500 => 40
 n=10**400; (n-500).primescntmr(n+500) => 1
 -10.primescnt -50  => 11
@@ -160,7 +162,6 @@ For all errors, the return value for each method is `nil`.
 
 This behavior is referenced to MRI Ruby.
 
-
 ## Coding Implementations
 The methods `primemr?`, `nthprime|primenth`, `primes`, `primescnt`, `primesmr`, and `primescnt` are coded in pure ruby.
 The methods `prime?` and `prime_division|factors` have two implementations.
@@ -174,6 +175,29 @@ If not, each method uses a fast pure ruby implementation based on the Sieve of Z
 New in 2.2.0, upon loading with Ruby 1.8 `require 'rubygems'` is invoked to enable installing gems.
 
 All the `primes-utils` methods are `instance_methods` for `class Integer`.
+
+## History
+```
+2.3.0 – primescnt now finds primes upto some integer much faster, and for much larger integers
+        increased index nth primes to over 2 billionth; used in nthprime|primenth and primescnt
+2.2.0 – for sozcore2: refactored to include more common code; changed output api; added memory
+        error messages when prms and prms_range arrays creation fails; for primenth: used new
+        function to compute parameter b and removed ceiling for it; increased number of index primes
+        in nths; primes, primescnt, and primenth|nthprime also refactored, will use all available mem
+2.1.0 – changed default PG in primes and primescnt from P13 to P5, significantly faster
+2.0.0 – new methods primesf, primesmr, primescnt, primescntf, primescntmr, primes_utils
+        also improved mem efficiency/speed and extended range for primes and primenth
+        changed default PG in nthprime|primenth from P11 to P7, major refactoring of all methods
+1.1.1 – more efficient/faster code to count up to nth prime in primenth
+1.1.0 – new nth prime approximation method in primenth
+1.0.6 – fixed n=1 check error for prime?
+1.0.5 – minor bug fix
+1.0.4 – fixed n=0 case for primenth; fixed subtle bug in primes, refactored to generalize code
+1.0.3 – minor bug fix
+1.0.2 – directly test for cli command factor on installed platform at start
+1.0.1 – check if using Ruby 1.8 at start, if so, require 'rational' library for gcd method
+1.0.0 – initial release April 1, 2015 with methods prime?, primemr?, primes, prime_division|factors, primenth|nthprime
+```
 
 ## Author
 Jabari Zakiya
