@@ -37,8 +37,8 @@ module Primes
         # Find primes within a number range: end_num - start_num
         # Uses 'prime?' to check primality of prime candidates in range
         sozdata = sozcore1(self, start_num, true) # true for primes
-        return sozdata[1] if !sozdata[0]          # if sozdata[0] false
         pcs_in_range, r, mod, modk, rescnt, residues, primes = sozdata
+
         pcs_in_range.times do         # find primes from this num pcs in range
           prime = modk + residues[r]
 	  primes << prime if prime.prime?
@@ -51,7 +51,6 @@ module Primes
         # Count primes within a number range: end_num - start_num
         # Uses 'prime?' to check primality of prime candidates in range
         sozdata = sozcore1(self, start_num, false) # false for primescnt
-        return sozdata[1] if !sozdata[0]           # if sozdata[0] false
         pcs_in_range, r, mod, modk, rescnt, residues, primescnt = sozdata
 
         pcs_in_range.times do         # count primes from this num pcs in range
@@ -76,7 +75,7 @@ module Primes
                        47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
                        107, 109, 113, 127, 131, 137, 139, 149, 151, 157,163,
                        167, 173, 179, 181, 191, 193, 197, 199, 211].include? n
-        return false if !residues.include?(n%mod) or n == 1
+        return false unless residues.include?(n%mod) and n > 1
 
         sqrtN = Math.sqrt(n).to_i
         p=11          # first test prime pj
@@ -101,18 +100,18 @@ module Primes
 
       def factors(p=13)
         # Return prime factors of n in form [[p1,e1],[p2,e2]..[pn,en]]
-        # Uses sozP13 Sieve of Zakiya (SoZ) as default Prime Generator
+        # Uses P13 SP PG as default Prime Generator
         seeds = [2, 3, 5, 7, 11, 13, 17, 19]
-        p = 13 if !seeds.include? p
+        p = 13 unless seeds.include? p
 
         primes = seeds[0..seeds.index(p)]
-	mod = primes.reduce(:*)   # modulus: modPn = 2*3*5*7*..*Pn
+        mod = primes.reduce(:*)   # modulus: modPn = 2*3*5*7*..*Pn
         residues, rescnt = make_residues_rescnt(mod)
 
         n = self.abs              # number to factor
         factors = []              # init empty factors array
 
-        return [] if n == 0
+        return [] if n < 2
         return [[n,1]] if primes.include? n
         primes.each {|p| while n%p == 0; factors << p; n /= p end }
 
@@ -136,10 +135,9 @@ module Primes
     alias  prime_division  factors
 
     def primenth(p=7)
-      # Return value of nth prime
-      # Uses sozP7 Sieve of Zakiya (SoZ) as default Prime Generator
+      # Return value of nth prime; P7 is default SP Prime Generator
       seeds = [2, 3, 5, 7, 11, 13]
-      p = 7 if !seeds.include? p
+      p = 7 unless seeds.include? p
 
       n = self.abs                  # the desired nth prime
       return n != 0 ? seeds[n-1] : 0  if n <= seeds.size
@@ -149,8 +147,8 @@ module Primes
 
       num = approximate_nth(n)      # close approx to nth >= real nth
       primes = seeds[0..seeds.index(p)]
-
-      prms, m, mod, modk, residues, rescnt, * = sozcore2(num, start_num, primes)
+      mod = primes.reduce(:*)       # create modulus of SP PG
+      prms, m, modk, residues, rescnt, pcs2start, * = sozcore2(num, start_num, mod)
       return if prms == nil         # exit gracefully if sozcore2 mem error
 
       # starting at start_num's location, find nth prime within given range
@@ -158,7 +156,7 @@ module Primes
       pcnt = prmcnt + prms[m..-1].count(1)  # number of primes upto nth approx
       return puts "#{pcnt} not enough primes, approx nth too small." if pcnt < n
       while prmcnt < n; prmcnt +=1 if prms[m] == 1; m +=1 end
-      k, r = (m + rescnt*(modk/mod)).divmod rescnt  # (m+pcs2ks).divmod rescnt
+      k, r = (m + pcs2start).divmod rescnt
       mod*k + residues[r]
     end
 
@@ -166,23 +164,25 @@ module Primes
 
     def primes(start_num=0)
       # Find primes between a number range: end_num - start_num
-      # Uses the P5 Strictly Prime (SP) Prime Generator
+      # Adaptively selects Strictly Prime (SP) Prime Generator
       num = self.abs;  start_num = start_num.abs
       num, start_num = start_num, num  if start_num > num
 
-      primes = [2,3,5]              # P5 excluded primes lists
-      plast  = primes.last          # last prime in primes
-      return primes.select {|p| p >= start_num && p <= num} if num <= plast
+      primes, mod = select_pg(num, start_num) # adaptively select PG
 
-      prms, m, mod, modk, residues, rescnt, maxprms, r = sozcore2(num, start_num, primes)
+      prms, m, modk, residues, rescnt, *, maxprms, r = sozcore2(num, start_num, mod)
       return if prms == nil         # exit gracefully if sozcore2 mem error
 
-      # starting at start_num's location, extract primes within given range
-      primes = start_num <= plast ? primes.select {|p| p >= start_num} : [] 
-      while m < maxprms              # find primes from pcs within given range
-	primes << modk + residues[r] if prms[m] == 1
+      # init 'primes' w/any excluded primes in range then extract primes from prms
+      primes = primes.select {|p| p >= start_num && p <= num}
+      while m < maxprms             # find primes from sieved pcs in prms for range
+        begin
+          primes << modk + residues[r] if prms[m] == 1
+          rescue Exception
+            return puts "ERROR3: not enough memory to store all primes in output array."
+        end
         r +=1; if r > rescnt; r=1; modk +=mod end
-	m +=1
+        m +=1
       end
       primes
     end
@@ -193,22 +193,19 @@ module Primes
       num = self.abs;  start_num = start_num.abs
       num, start_num = start_num, num  if start_num > num
 
-      seeds = [2, 3, 5, 7, 11, 13]
-      plast = seeds.last            # last prime in seeds
-      return seeds.select {|p| p >= start_num && p <= num}.size if num <= plast
-
-      if start_num == 0
+      if start_num < 3              # for all primes upto num
         start_num, nth, nthflag = set_start_value(num,false)
-        return nth if !nthflag      # output nth's number if n a ref nth prime
+        return nth unless nthflag   # output nth's number if n a ref nth prime
       end
 
-      primes = nthflag ? [2,3,5,7] : [2,3,5]  # choose P7 or P5
-      prms, m, * = sozcore2(num, start_num, primes)
+      primes = nthflag ? [2,3,5,7] : [2,3,5]  # use P7 upto an N; P5 for a range
+      mod = primes.reduce(:*)
+      prms, m, * = sozcore2(num, start_num, mod)
       return if prms == nil         # exit gracefully if sozcore2 mem error
 
-      # starting at start_num's location, count primes within given range
-      prmcnt = start_num <= plast ? primes.select {|p| p >= start_num}.size : 0
-      prmcnt = nth > 0 ? nth-1 : primes.size if nthflag  # nflag is nil or true
+      # init prmcnt for any excluded primes in range then count primes in prms
+      prmcnt = primes.select {|p| p >= start_num && p <= num}.size
+      prmcnt = nth-1 if nthflag && nth > 0    # nflag is nil or true
       prmcnt + prms[m..-1].count(1)
     end
 
@@ -220,8 +217,8 @@ module Primes
     require 'openssl'
     def primemr?(k=20)  # increase k for more reliability
       n = self.abs
-      return true  if n == 2 or n == 3
-      return false if n % 6 != 1 && n % 6 != 5 or n == 1
+      return true  if [2,3].include? n
+      return false unless [1,5].include?(n%6) and n > 1
 
       d = n - 1
       s = 0
@@ -244,8 +241,8 @@ module Primes
       # Find primes within a number range: end_num - start_num
       # Uses 'primemr' to check primality of prime candidates in range
       sozdata = sozcore1(self, start_num, true)  # true for primes
-      return sozdata[1] if !sozdata[0]           # if sozdata[0] false
       pcs_in_range, r, mod, modk, rescnt, residues, primes = sozdata
+
       pcs_in_range.times do         # find primes from this num pcs in range
         prime = modk + residues[r]
 	primes << prime if prime.primemr?
@@ -258,7 +255,6 @@ module Primes
       # Count primes within a number range: end_num - start_num
       # Uses 'primemr' to check primality of prime candidates in range
       sozdata = sozcore1(self, start_num, false) # false for primescnt
-      return sozdata[1] if !sozdata[0]           # if sozdata[0] false
       pcs_in_range, r, mod, modk, rescnt, residues, primescnt = sozdata
 
       pcs_in_range.times do         # count primes from this num pcs in range
@@ -280,115 +276,105 @@ module Primes
 
     private
     def make_residues_rescnt(mod)
-      residues=[1]; 3.step(mod,2) {|i| residues << i if mod.gcd(i) == 1}
+      residues=[1]; 3.step(mod,2) {|r| residues << r if mod.gcd(r) == 1}
       residues << mod+1
       [residues, residues.size-1]   # return residues array and rescnt
     end
 
-    def pcs_to_num(num,mod,rescnt,residues) # find number of pcs upto num
-      num = num-1 | 1               # if N even number then subtract 1
-      k=num/mod; modk = mod*k; r=1  # init parameters for kth resgroup
-      while num >= modk+residues[r]; r += 1 end # find pc location r >= num
-      rescnt*k + r-1                # max number of pcs <= num
+    # lte= true: first output element is number pcs <= num
+    # lte=false: num pcs <, residue index, and resgroup value, for (start_)num pc
+    def pcs_to_num(num,mod,rescnt,residues,lte)
+      num -=1; lte ? (num |=1; k=num.abs/mod) : k = (num-1).abs/mod
+      modk = mod*k; r=1
+      r +=1 while num >= modk+residues[r]
+      [rescnt*k + r-1, r, modk]     # [num pcs, r index, num modulus]
     end
 
-    def pcs_to_start_num(start_num, mod, rescnt, residues)
-      k = (start_num-2).abs/mod     # start_num's residue group value
-      modk = mod*k                  # start_num's mod group value
-      m = rescnt*k                  # number of pcs upto kth resgroup
-      r = 1                         # find r,m for first pc >= start_num
-      while modk + residues[r] < start_num; r +=1 end
-      [m+r-1, r, modk]              # parameters for 1st pc >= start_num
-    end
-
+    # Use default SP Prime Generator to parametize the pcs within a range
+    # inputs:  end_num|start_num of range; method_flag to numerate|count primes
+    # outputs: maxpcs-m - number of pcs in the range
+    #          r        - residue index value for start_num pc of range
+    #          mod      - mod value for PG
+    #          modk     - base value for start_num's resgroup
+    #          rescnt   - number of residues for PG
+    #          residues - array of residues plus mod+1 for PG
+    #          primes array|primes.size - primes array or size based on method_flag
     def sozcore1(num, start_num, method_flag)
-      # Uses the P13 Strictly Prime (SP) Prime Generator
       num = num.abs;   start_num = start_num.abs
       num, start_num = start_num, num  if start_num > num
 
-      primes = [2,3,5,7,11,13]      # P13 excluded primes lists
-      plast  = primes.last          # last prime in primes              
-      if num <= plast
-	primes = primes.select {|p| p >= start_num && p <= num}
-	return [false, method_flag ? primes : primes.size]
-      end
+      primes = [2,3,5,7,11,13]      # excluded primes for P13 default SP PG          
       mod = primes.reduce(:*)       # P13 modulus: 2*3*5*7*11*13 = 30030
       residues, rescnt = make_residues_rescnt(mod)
-      maxpcs = pcs_to_num(num, mod, rescnt, residues) # num of pcs <= end_num
+      maxpcs,* = pcs_to_num(num,mod,rescnt,residues,true) # num pcs <= end_num
 
-      # compute parameters for start location and number of pcs within range
-      primes = start_num <= plast ? primes.select {|p| p >= start_num} : [] 
-      m, r, modk = pcs_to_start_num(start_num, mod, rescnt, residues)
+      # init 'primes' w/any excluded primes in the range, or [] if none
+      primes = primes.select {|p| p >= start_num && p <= num}
 
+      # compute parameters for start_num pc, then create output parameters array
+      m, r, modk = pcs_to_num(start_num, mod, rescnt, residues, false)
       [maxpcs-m, r, mod, modk, rescnt, residues, method_flag ? primes : primes.size]
     end
 
-    # Perform SoZ for given Prime Generator and return array of parameters
-    # inputs:  end_num and start_num of range; excluded primes array for PG
+    # Perform SoZ with given Prime Generator and return array of parameters
+    # inputs:  end_num and start_num of range and mod value for PG
     # outputs: prms - binary (0,1) array of pcs within a range or to end_num
-    #          m    - r-1, num of pcs in ks before start_num residue r
-    #          mod  - modulus value for PG
-    #          modk - mod*ks; mod value for ks, start_num's resgroup
+    #          m    - num of pcs in prms < start_num; so prms[m] = start_num
+    #          modks    - mod value for start_num's resgroup
     #          residues - array of residues plus mod+1 for PG
-    #          rescnt   - number of residues < mod
-    #          maxprms  - the number of pcs in range to find primes from
-    #          r    - first residue index location in ks >= start_num
+    #          rescnt   - number of residues for PG
+    #          pcs2start- number of pcs < start_num pc
+    #          maxprms  - number of pcs to find primes from; prms array size
+    #          rs   - residue index location for first pc >= start_num
+    def sozcore2(num, start_num, mod)
+      residues, rescnt = make_residues_rescnt(mod)  # parameters for the PG
+      maxprms,* = pcs_to_num(num,mod,rescnt,residues,true) # num pcs <= end_num
 
-    def sozcore2(num, start_num, primes)
-      mod = primes.reduce(:*)       # modulus: modPn = 2*3*5*7*..*Pn
-      residues, rescnt = make_residues_rescnt(mod)
-      maxprms = pcs_to_num(num,mod,rescnt,residues) # num of pcs <= end_num
-
+      # for start_num pc, find num pcs <, residue index, and resgroup mod value 
+      pcs2start, rs, modks = pcs_to_num(start_num, mod, rescnt, residues, false)      
+ 
       sqrtN = Math.sqrt(num).to_i   # sqrt of end_num (end of range)
-      pcs2sqrtN = pcs_to_num(sqrtN,mod,rescnt,residues) # num of pcs <= sqrtN
+      pcs2sqrtN,* = pcs_to_num(sqrtN,mod,rescnt,residues,true) # num pcs <= sqrtN
 
-      ks = (start_num-2).abs/mod    # start_num's resgroup value
-      maxpcs = maxprms              # if ks = 0 use this for prms array
-      begin                         # start arrays mem error handling block
-        if ks > 0                   # if start_num > mod+1
-	  maxpcs = pcs2sqrtN        # find primes in pcs upto sqrtN
-          pcs2ks = rescnt*ks        # number of pcs upto ks resgroup
-          max_range =maxprms-pcs2ks # number of pcs from ks resgroup to end_num
-	  begin
-            prms_range = Array.new(max_range,1) # pc array to hold range primes
-	    rescue                  # for not enough memory error for prms_range
-	      return puts "ERROR1: range size too big for available memory."
-	  end  
-	end
-        prms=Array.new(maxpcs,1)    # for primes upto sqrtN and end_num if ks=0
-        rescue                      # for not enough memory error for prms
-	  return puts "ERROR2: end_num too big for available memory."
-      end                           # method return value is `nil` upon error
+      split_arrays = start_num > sqrtN # flag, true if two arrays used for sieve
+      maxpcs = maxprms              # init array size for all pcs to end_num 
+      if split_arrays               # if start_num > sqrtN create two arrays
+        maxpcs = pcs2sqrtN          # number of pcs|array size, for pcs <= sqrtN
+        max_range = maxprms-pcs2start # number of pcs in range start_num to end_num     
+	prms_range = array_check(max_range,1) # array to represent pcs in range
+        return puts "ERROR1: range size too big for available memory." unless prms_range
+      end
+      prms = array_check(maxpcs,1)  # array for pcs upto sqrtN, or end_num
+      return puts "ERROR2: end_num too big for available memory." unless prms
 
-      # hash of residues offsets to compute nonprimes positions in prms
+      # residues offsets to compute a pcs address in its resgroup in prms
       pos =[]; rescnt.times {|i| pos[residues[i]] = i-1}
 
       # Sieve of Zakiya (SoZ) to eliminate nonprimes from prms and prms_range
       modk,r,k=0,0,0
       pcs2sqrtN.times do |i|        # sieve primes from pcs upto sqrt(end_num)
         r +=1; if r > rescnt; r=1; modk +=mod; k +=1 end
-	next unless prms[i]==1
-        res_r = residues[r]
-        prime = modk + res_r
-        prmstep = prime * rescnt
-        residues[1..-1].each do |ri|
-          # compute (prime * (modk + ri)) position index in prms
-          kk,rr  = (res_r * ri).divmod mod  # residues product res[group|track]
-          nonprm = (k*(prime + ri) + kk)*rescnt + pos[rr] # 1st prime multiple
+        next unless prms[i] == 1    # when a prime location found
+        prm_r = residues[r]         # its residue value is saved
+        prime = modk + prm_r        # its value is numerated
+        prmstep = prime * rescnt    # its primestep computed
+        kcon = k * prmstep          # its inner loop constant computed
+        residues[1..-1].each do |ri|# now perform sieve with it
+          # convert (prime * (modk + ri)) pc value to its address in prms
+          # computed as nonprm = (k*(prime + ri) + kn)*rescnt + pos[rr]
+          kn,rr  = (prm_r * ri).divmod mod            # residues product res[group|track]
+          nonprm =kcon + (k*ri + kn)*rescnt + pos[rr] # 1st prime multiple address with ri
           while nonprm < maxpcs; prms[nonprm]=0; nonprm +=prmstep end
-	  if ks > 0
-	    nonprm = (pcs2ks - nonprm)%prmstep        # translate current prime to ks
-	    nonprm = prmstep - nonprm if nonprm != 0  # determine its location
-	    while nonprm < max_range; prms_range[nonprm]=0; nonprm += prmstep end
-	  end
+          if split_arrays                             # when start_num > sqrtN
+            nonprm = (pcs2start - nonprm)%prmstep     # (start_num - last multiple) pcs
+            nonprm = prmstep - nonprm if nonprm != 0  # location in range, or beyond
+            while nonprm < max_range; prms_range[nonprm]=0; nonprm += prmstep end
+          end
         end
       end
-
-      if ks > 0; prms = prms_range; maxprms = max_range end
-      r=1; modk = mod*ks                              # find 1st residue val|location
-      while modk + residues[r] < start_num; r +=1 end # r in ks >= start_num
-
-      [prms, m=r-1, mod, modk, residues, rescnt, maxprms, r]  # parameter output
+      # determine prms array parameters and starting location value m for start_num
+      split_arrays ? (prms = prms_range; maxprms = max_range; m=0) : m=pcs2start
+      [prms, m, modks, residues, rescnt, pcs2start, maxprms, rs] # parameters output
     end
 
     def approximate_nth(n)          # approximate nthprime value >= real value
@@ -397,14 +383,14 @@ module Primes
       (n*(Math.log(n)+a)+3).to_i    # use nth approximation as end_num of range
     end
 
-    def set_start_value(n, hshflag) # find largest index nthprime|val <= requested
+    def set_start_value(n, hshflag) # find largest index nthprime|val <= n
       if hshflag
         return [nths[n], 0, true] if nths.has_key? n       # if n is key in nths table
-        nth = nths.keys.sort.select {|k| k < n}.last       # find largest indexed key < n
+	nth = nths.keys.sort.reverse.detect {|k| k < n}    # find largest indexed key < n
         [nth ? nths[nth] : 0, nth ||= n+1, false]          # [start_num, nth, false]
       else
         return [0,nths.key(n),false] if nths.has_value? n  # if n is value in nths table
-        v=val = nths.values.sort.select {|v| v < n}.last   # find largest indexed val < n
+	v=val= nths.values.sort.reverse.detect {|v| v < n} # find largest indexed val < n
         [v ||= 0, val ? nths.key(val) : 0, true]           # [start_num, nth, true]
       end
     end
@@ -467,9 +453,19 @@ module Primes
         1987500000=>46748693981, 2000000000=>47055833459, 2012500000=>47363059687
       }
     end
+
+    def select_pg(num, start_num)   # adaptively select PG
+      primes = [2, 3, 5]
+      primes = num > 10**8 ? [2,3,5,7,11] : [2,3,5,7] if start_num < 3    
+      [primes, primes.reduce(:*)]   # [excluded primes, mod] for PG
+    end
+
+    def array_check(n,v)  # catch out-of-memory errors on array creation
+      begin Array.new(n,v) rescue return end  # return an array or nil
+    end
   end
 end
 
 class Integer; include Primes::Utils end
-  
+
 puts "Available methods are: #{0.primes_utils}"  # display methods upon loading

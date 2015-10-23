@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jzakiya@gmail.com"]
 
   spec.summary       = %q{suite of extremely fast utility methods for testing and generating primes}
-  spec.description   = %q{Methods: prime?, primemr?, primes, primesf, primesmr, primescnt, primescntf, primescntmr, primenth|nthprime, factors|prime_division}
+  spec.description   = %q{Methods: prime?, primemr?, primes, primesf, primesmr, primescnt, primescntf, primescntmr, primenth|nthprime, factors|prime_division, primes_utils}
   spec.homepage      = "https://github.com/jzakiya/primes-utils"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

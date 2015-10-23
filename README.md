@@ -101,6 +101,9 @@ n=10**100; (n-250).primesmr(n+250) => []
 prms.size => 6
 prms => [1000003, 1000033, 1000037, 1000039, 1000081, 1000099]
 -10.primes -50  => [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+n=10**20; n.primes n+n  -> ERROR1: range size too big for available memory. => nil
+n=10**20; n.primes 100  -> ERROR2: end_num too big for available memory. => nil
+n=10**8;  (25*n).primes -> ERROR3: not enough memory to store all primes in output array. => nil
 0.primesf  => []
 1.primesmr => []
 ```
@@ -120,6 +123,9 @@ Also see `Error Handling`.
 100000.primescntf 100500 => 40
 n=10**400; (n-500).primescntmr(n+500) => 1
 -10.primescnt -50  => 11
+n=10**20; n.primescnt n+n -> ERROR1: range size too big for available memory. => nil
+n=10**20; n.primescnt 100 -> ERROR2: end_num too big for available memory. => nil
+n=10**8; (25*n).primescnt => 121443371
 0.primescntf  => 0
 1.primescntmr => 0
 ```
@@ -138,6 +144,7 @@ Also see `Error Handling`.
 2000000.nthprime 11 => 32452843
 -500000.nthprime => 7368787
 1122951705.nthprime => 25741879847
+n = 10**11; n.primenth -> ERROR1: range size too big for available memory. => nil
 0.nthprime => 0
 1.primenth => 2
 ```
@@ -152,13 +159,19 @@ Use as `x.primes_utils` where x is any `class Integer` value.
 ```
 
 ## Error Handling
-Starting with 2.2.0, error handling has been implemented to gracefully handle when array creation requires more memory than available.
+Starting with 2.2.0, error handling has been implemented to gracefully fail when array creation requires more memory than available.
 This occurs when the range size, or end_num, need arrays greater than the amount of avalable memory. The first case shows the message
 `ERROR1: range size too big for available memory.` and the second case `ERROR2: end_num too big for available memory.`
-The affected methods are `nthprime|primenth`, `primes`, and `primescnt`.
-`nthprime|primenth` also displays the error message `<yyyy> not enough primes, approx nth too small.` 
-(where `<yyyy>` is an integer value) when the computed approx_nth value < nth value.
+The affected methods are `primes`, and `primescnt`, and possibly `nthprime|primenth`.
+`nthprime|primenth` also displays the error message `<pcnt> not enough primes, approx nth too small.` 
+(`<pcnt>` is computed count of primes) when the computed approx_nth value < nth value (though this should never happen by design).
+With 2.4.0 error handling was added to `primes` that catches the error and displays message `ERROR3: not enough memory to store all primes in output array.`.
 For all errors, the return value for each method is `nil`.
+
+There is also the rare possibility you could get a `NoMemoryError: failed to allocate memory` for the methods 
+`primesf` and `primesmr` if their list of numerated primes is bigger than the amount of available system memory needed to store them. 
+If those methods are used as designed these errors won't occur, so the extra code isn't justified for them.
+If they occur you will know why now.
 
 This behavior is referenced to MRI Ruby.
 
@@ -178,6 +191,12 @@ All the `primes-utils` methods are `instance_methods` for `class Integer`.
 
 ## History
 ```
+2.4.0 – fixed error in algorithm when ks resgroup ≤ sqrt(end_num) resgroup; algorithm now split
+        arrays when start_num > sqrt(end_num) in sozcore2, whose code also signficantly optimized,
+        with API change adding pcs2start value to output parameters to use in primenth, which changed
+        to use it; ruby idiom code opt for set_start_value; consolidated pcs_to_num | pcs_to_start_num  
+        functions into one new pcs_to_num, with associated changes in sozcore1|2; primes|cnt also
+        significantly faster resulting from sozcore2 changes; massive code cleanups all-arround
 2.3.0 – primescnt now finds primes upto some integer much faster, and for much larger integers
         increased index nth primes to over 2 billionth; used in nthprime|primenth and primescnt
 2.2.0 – for sozcore2: refactored to include more common code; changed output api; added memory
