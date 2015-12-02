@@ -2,21 +2,22 @@
 
 ## Introduction
 
-`primes-utils` is a Rubygem which provides a suite of extremely fast (relative to Ruby's standard library) utility methods for testing and generating primes.
+`primes-utils` is a Rubygem which provides a suite of extremely fast utility methods for testing and generating primes.
 
-For details on best use practices and implementation details see:
+For details on the Math and Code used to implement them see:
 
 `PRIMES-UTILS HANDBOOK`
 
+Now available and `FREE` to view and download at:
+
 https://www.scribd.com/doc/266461408/Primes-Utils-Handbook
 
-Periodically check for updates.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-```ruby
+```
 gem 'primes-utils'
 ```
 
@@ -59,8 +60,9 @@ The reliability can be increased by increasing the default input parameter of k=
 1111111111111111111.primemr?(50) => true
 11111111111111111111.primemr? => false
 -3333333333333333333.primemr? => false
-0.prime? => false
-1.prime? => false
+n=10**1700; (n+469).primemr? => true
+0.primemr? => false
+1.primemr? => false
 ```
 
 **factors(p=13) or prime_division(p=13)**
@@ -86,7 +88,7 @@ Can change SP PG used on input. Acceptable primes range: [3 - 19].
 
 Return an array of primes within the absolute value range `(|start| - |end|)`.
 The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`.
-If only one parameter used, then all the primes upto that number will be returned.
+If only one parameter used, then all the primes up to that number will be returned.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
 
@@ -112,7 +114,7 @@ n=10**8;  (25*n).primes -> ERROR3: not enough memory to store all primes in outp
 
 Provide count of primes within the absolute value range `(|start| - |end|)`.
 The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`.
-If only one parameter used, the count of all the primes upto that number will be returned.
+If only one parameter used, the count of all the primes up to that number will be returned.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
 
@@ -152,7 +154,7 @@ n = 10**11; n.primenth -> ERROR1: range size too big for available memory. => ni
 **primes_utils**
 
 Displays a list of all the `primes-utils` methods available for your system.
-Use as `x.primes_utils` where x is any `class Integer` value.
+Use as `n.primes_utils` where n is any `class Integer` value.
 
 ```
 0.primes_utils => "prime? primemr? primes primesf primesmr primescnt primescntf primescntmr primenth|nthprime factors|prime_division"
@@ -162,9 +164,9 @@ Use as `x.primes_utils` where x is any `class Integer` value.
 Starting with 2.2.0, error handling has been implemented to gracefully fail when array creation requires more memory than available.
 This occurs when the range size, or end_num, need arrays greater than the amount of avalable memory. The first case shows the message
 `ERROR1: range size too big for available memory.` and the second case `ERROR2: end_num too big for available memory.`
-The affected methods are `primes`, and `primescnt`, and possibly `nthprime|primenth`.
+The affected methods are `primes`, `primescnt`, and `nthprime|primenth`.
 `nthprime|primenth` also displays the error message `<pcnt> not enough primes, approx nth too small.` 
-(`<pcnt>` is computed count of primes) when the computed approx_nth value < nth value (though this should never happen by design).
+(`<pcnt>` is computed count of primes) when the computed approx_nth value is < nth value (though this should never happen by design).
 With 2.4.0 error handling was added to `primes` that catches the error and displays message `ERROR3: not enough memory to store all primes in output array.`.
 For all errors, the return value for each method is `nil`.
 
@@ -191,12 +193,17 @@ All the `primes-utils` methods are `instance_methods` for `class Integer`.
 
 ## History
 ```
+2.5.0 –	9 more index primes under the 110-millionth in nths; fixed Ruby 1.8 incompatibility in primes;
+	better|simpler technique for select_pg, significant speed increases for large ranges; used now
+	in all sozcore2 client methods primes, primescnt and primenth|nthprime; more code cleanups
 2.4.0 – fixed error in algorithm when ks resgroup ≤ sqrt(end_num) resgroup; algorithm now split
         arrays when start_num > sqrt(end_num) in sozcore2, whose code also signficantly optimized,
         with API change adding pcs2start value to output parameters to use in primenth, which changed
         to use it; ruby idiom code opt for set_start_value; consolidated pcs_to_num | pcs_to_start_num  
         functions into one new pcs_to_num, with associated changes in sozcore1|2; primes|cnt also
-        significantly faster resulting from sozcore2 changes; massive code cleanups all-arround
+        significantly faster resulting from sozcore2 changes; massive code cleanups all-arround; added 
+	private methods select_pg (to adaptively select the pg used in primes), and array_check (used in
+	sozcore2 to catch array creation out-of-memory errors)
 2.3.0 – primescnt now finds primes upto some integer much faster, and for much larger integers
         increased index nth primes to over 2 billionth; used in nthprime|primenth and primescnt
 2.2.0 – for sozcore2: refactored to include more common code; changed output api; added memory
