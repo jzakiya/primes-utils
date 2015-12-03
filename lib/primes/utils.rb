@@ -215,10 +215,10 @@ module Primes
       (d >>= 1; s += 1) while d.even?
       k.times do
         a = 2 + rand(n-4)
-        x = a.to_bn.mod_exp(d,n)      # x = (a**d) mod n
+        x = a.to_bn.mod_exp(d,n)    # x = (a**d) mod n
         next if x == 1 or x == n-1
         (s-1).times do
-          x = x.mod_exp(2,n)          # x = (x**2) mod n
+          x = x.mod_exp(2,n)        # x = (x**2) mod n
           return false if x == 1
           break if x == n-1
         end
