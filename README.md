@@ -193,7 +193,7 @@ All the `primes-utils` methods are `instance_methods` for `class Integer`.
 
 ## History
 ```
-2.5.0 –	9 more index primes under the 110-millionth in nths; fixed Ruby 1.8 incompatibility in primes;
+2.5.0 – 9 more index primes under the 110-millionth in nths; fixed Ruby 1.8 incompatibility in primes;
         better|simpler technique for select_pg, significant speed increases for large ranges; used now
         in all sozcore2 client methods primes, primescnt and primenth|nthprime; more code cleanups
 2.4.0 – fixed error in algorithm when ks resgroup ≤ sqrt(end_num) resgroup; algorithm now split
