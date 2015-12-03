@@ -194,16 +194,16 @@ All the `primes-utils` methods are `instance_methods` for `class Integer`.
 ## History
 ```
 2.5.0 –	9 more index primes under the 110-millionth in nths; fixed Ruby 1.8 incompatibility in primes;
-	better|simpler technique for select_pg, significant speed increases for large ranges; used now
-	in all sozcore2 client methods primes, primescnt and primenth|nthprime; more code cleanups
+        better|simpler technique for select_pg, significant speed increases for large ranges; used now
+        in all sozcore2 client methods primes, primescnt and primenth|nthprime; more code cleanups
 2.4.0 – fixed error in algorithm when ks resgroup ≤ sqrt(end_num) resgroup; algorithm now split
         arrays when start_num > sqrt(end_num) in sozcore2, whose code also signficantly optimized,
         with API change adding pcs2start value to output parameters to use in primenth, which changed
         to use it; ruby idiom code opt for set_start_value; consolidated pcs_to_num | pcs_to_start_num  
         functions into one new pcs_to_num, with associated changes in sozcore1|2; primes|cnt also
         significantly faster resulting from sozcore2 changes; massive code cleanups all-arround; added 
-	private methods select_pg (to adaptively select the pg used in primes), and array_check (used in
-	sozcore2 to catch array creation out-of-memory errors)
+        private methods select_pg (to adaptively select the pg used in primes), and array_check (used in
+        sozcore2 to catch array creation out-of-memory errors)
 2.3.0 – primescnt now finds primes upto some integer much faster, and for much larger integers
         increased index nth primes to over 2 billionth; used in nthprime|primenth and primescnt
 2.2.0 – for sozcore2: refactored to include more common code; changed output api; added memory
