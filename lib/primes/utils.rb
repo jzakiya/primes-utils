@@ -256,7 +256,7 @@ module Primes
 
     def primes_utils                # display list of available methods
       methods = %w/prime? primemr? primes primesf primesmr primescnt
-                   primescntf primescntmr primenth|nthprime factors|prime_division/
+                   primescntf primescntmr primenth|nthprime factors|prime_division primes_utils/
       (methods - (@@os_has_factor ? [] : %w/primesf primescntf/)).join(" ")
     end
 
@@ -448,7 +448,6 @@ module Primes
       primes = [2, 3, 5]                      # use P5 for small ranges
       primes << 7  if range_size > 35*10**5   # use P7 for midsize ranges
       primes << 11 if range_size > 850*10**5  # use P11 for large ranges
-      primes << 13 if range_size > 550*10**7  # use P13 for larger ranges
       [primes, primes.reduce(:*)]   # [excluded primes, mod] for PG
     end
 
