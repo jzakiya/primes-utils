@@ -135,9 +135,9 @@ n=10**8; (25*n).primescnt => 121443371
 **primenth(p=7) or nthprime(p=7)**
 
 Return the value of the (absolute value of) nth prime.
-Default Strictly Prime (SP) Prime Generator (PG) used here is P7.
+Default Strictly Prime (SP) Prime Generator (PG) is adaptively selected.
 Can change SP PG used on input. Acceptable primes range: [3 - 13].
-Indexed nth primes now upto 1.6 billionth.
+Indexed nth primes now upto 2.01 billionth.
 Also see `Error Handling`.
 
 ```
@@ -157,7 +157,7 @@ Displays a list of all the `primes-utils` methods available for your system.
 Use as `n.primes_utils` where n is any `class Integer` value.
 
 ```
-0.primes_utils => "prime? primemr? primes primesf primesmr primescnt primescntf primescntmr primenth|nthprime factors|prime_division"
+0.primes_utils => "prime? primemr? primes primesf primesmr primescnt primescntf primescntmr primenth|nthprime factors|prime_division primes_utils"
 ```
 
 ## Error Handling
