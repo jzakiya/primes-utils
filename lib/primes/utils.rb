@@ -359,7 +359,7 @@ module Primes
         end
       end
       # determine prms array parameters and starting location value m for start_num
-      split_arrays ? (prms = prms_range; maxprms = max_range; m=0) : m=pcs2start
+      split_arrays ? (prms = prms_range; maxprms = max_range; m=0) : m = pcs2start
       [prms, m, modks, residues, rescnt, pcs2start, maxprms, rs] # parameters output
     end
 
@@ -444,10 +444,20 @@ module Primes
     end
 
     def select_pg(num, start_num)   # adaptively select PG
-      range_size = num - start_num
-      primes = [2, 3, 5]                      # use P5 for small ranges
-      primes << 7  if range_size > 35*10**5   # use P7 for midsize ranges
-      primes << 11 if range_size > 850*10**5  # use P11 for large ranges
+      range = num - start_num
+      pg = 5
+      if start_num <= Math.sqrt(num).to_i     # for one array of primes upto N
+        pg =  7 if num >  50*10**4
+        pg = 11 if num > 305*10**5
+      else                                    # for split array cases
+        pg =  7 if ((10**6...10**7).cover? range and start_num < 10**8)  or
+                   ((10**7...10**8).cover? range and start_num < 10**10) or
+                   ((10**8...10**9).cover? range and start_num < 10**12) or
+                   (range >= 10**9 and start_num < 10**14)
+        pg = 11 if ((10**8...10**9).cover? range and start_num < 10**10) or
+                   (range >= 10**9 and start_num < 10**11)
+      end
+      primes = [2,3,5,7,11,13].select! {|p| p <= pg}
       [primes, primes.reduce(:*)]   # [excluded primes, mod] for PG
     end
 
