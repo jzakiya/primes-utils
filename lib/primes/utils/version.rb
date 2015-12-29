@@ -3,3 +3,4 @@ module Primes
     VERSION = "2.7.0"
   end
 end
+
