@@ -1,4 +1,4 @@
-# need rubygems to load gems, and rational for 'gcd' method for 1.8
+y# need rubygems to load gems, and rational for 'gcd' method for 1.8
 %w/rubygems rational/.each{|r| require r} if RUBY_VERSION =~ /^(1.8)/
 
 require "primes/utils/version"
@@ -255,8 +255,8 @@ module Primes
     end
 
     def primes_utils                # display list of available methods
-      methods = %w/prime? primemr? primes primesf primesmr primescnt
-                   primescntf primescntmr primenth|nthprime factors|prime_division primes_utils/
+      methods = %w/prime? primemr? primes primesf primesmr primescnt primescntf
+                   primescntmr primenth|nthprime factors|prime_division primes_utils/
       (methods - (@@os_has_factor ? [] : %w/primesf primescntf/)).join(" ")
     end
 
