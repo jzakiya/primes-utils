@@ -450,12 +450,12 @@ module Primes
         pg =  7 if num >  50*10**4
         pg = 11 if num > 305*10**5
       else                                    # for split array cases
-        pg =  7 if ((10**6...10**7).cover? range and start_num < 10**8)  or
-                   ((10**7...10**8).cover? range and start_num < 10**10) or
-                   ((10**8...10**9).cover? range and start_num < 10**12) or
-                   (range >= 10**9 and start_num < 10**14)
-        pg = 11 if ((10**8...10**9).cover? range and start_num < 10**10) or
-                   (range >= 10**9 and start_num < 10**11)
+        pg =  7 if (range.between?(10**6, 10**7-1) && start_num < 10**8)     ||
+                   (range.between?(10**7, 10**8-1) && start_num < 46*10**8)  ||
+                   (range.between?(10**8, 10**9-1) && start_num < 16*10**10) ||
+                   (range >= 10**9 && start_num < 26*10**12)
+        pg = 11 if (range.between?(10**8, 10**9-1) && start_num < 55*10**7)  ||
+                   (range >= 10**9 && start_num < 45*10**9)
       end
       primes = [2,3,5,7,11,13].select! {|p| p <= pg}
       [primes, primes.reduce(:*)]   # [excluded primes, mod] for PG

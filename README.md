@@ -193,6 +193,7 @@ All the `primes-utils` methods are `instance_methods` for `class Integer`.
 
 ## History
 ```
+2.7.0 – more tweaking adaptive pg selection ranges in select_pg; coded using between? instead of cover?
 2.6.0 – much, much better adaptive pg selection algorithm used in select_pg
 2.5.1 – corrected minor error in select_pg
 2.5.0 – 9 more index primes under the 110-millionth in nths; fixed Ruby 1.8 incompatibility in primes;
