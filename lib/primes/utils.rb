@@ -1,4 +1,4 @@
-y# need rubygems to load gems, and rational for 'gcd' method for 1.8
+# need rubygems to load gems, and rational for 'gcd' method for 1.8
 %w/rubygems rational/.each{|r| require r} if RUBY_VERSION =~ /^(1.8)/
 
 require "primes/utils/version"
@@ -20,7 +20,7 @@ module Primes
     if @@os_has_factor   # for platforms with cli 'factor' command
 
       def prime?
-	`factor #{self.abs}`.split(' ').size == 2
+        `factor #{self.abs}`.split(' ').size == 2
       end
 
       def factors(p=0)   # p is unused dummy variable for method consistency
@@ -36,8 +36,8 @@ module Primes
 
         pcs_in_range.times do         # list primes from this num pcs in range
           prime = modk + residues[r]
-	  primes << prime if prime.prime?
-	  r +=1; if r > rescnt; r=1; modk +=mod end
+          primes << prime if prime.prime?
+          r +=1; if r > rescnt; r=1; modk +=mod end
         end
         primes
       end
@@ -49,8 +49,8 @@ module Primes
         pcs_in_range, r, mod, modk, rescnt, residues, primescnt = sozdata
 
         pcs_in_range.times do         # count primes from this num pcs in range
-	  primescnt +=1 if (modk + residues[r]).prime?
-	  r +=1; if r > rescnt; r=1; modk +=mod end
+          primescnt +=1 if (modk + residues[r]).prime?
+          r +=1; if r > rescnt; r=1; modk +=mod end
         end
         primescnt
       end
@@ -235,8 +235,8 @@ module Primes
 
       pcs_in_range.times do         # list primes from this num pcs in range
         prime = modk + residues[r]
-	primes << prime if prime.primemr?
-	r +=1; if r > rescnt; r=1; modk +=mod end
+        primes << prime if prime.primemr?
+        r +=1; if r > rescnt; r=1; modk +=mod end
       end
       primes
     end
@@ -248,8 +248,8 @@ module Primes
       pcs_in_range, r, mod, modk, rescnt, residues, primescnt = sozdata
 
       pcs_in_range.times do         # count primes from this num pcs in range
-	primescnt +=1 if (modk + residues[r]).primemr?
-	r +=1; if r > rescnt; r=1; modk +=mod end
+      primescnt +=1 if (modk + residues[r]).primemr?
+        r +=1; if r > rescnt; r=1; modk +=mod end
       end
       primescnt
     end
@@ -327,7 +327,7 @@ module Primes
       if split_arrays               # if start_num > sqrtN create two arrays
         maxpcs = pcs2sqrtN          # number of pcs|array size, for pcs <= sqrtN
         max_range = maxprms-pcs2start # number of pcs in range start_num to end_num
-	prms_range = array_check(max_range,1) # array to represent pcs in range
+        prms_range = array_check(max_range,1) # array to represent pcs in range
         return puts "ERROR1: range size too big for available memory." unless prms_range
       end
       prms = array_check(maxpcs,1)  # array for pcs upto sqrtN, or end_num
@@ -347,9 +347,9 @@ module Primes
         kcon = k * prmstep          # its inner loop constant computed
         residues[1..-1].each do |ri|# now perform sieve with it
           # convert (prime * (modk + ri)) pc value to its address in prms
-	  # computed as nonprm = (k*(prime + ri) + kn)*rescnt + pos[rr]
+          # computed as nonprm = (k*(prime + ri) + kn)*rescnt + pos[rr]
           kn,rr  = (prm_r * ri).divmod mod            # residues product res[group|track]
-	  nonprm = kcon + (k*ri + kn)*rescnt + pos[rr]# 1st prime multiple address with ri
+          nonprm = kcon + (k*ri + kn)*rescnt + pos[rr]# 1st prime multiple address with ri
           while nonprm < maxpcs; prms[nonprm]=0; nonprm +=prmstep end
           if split_arrays                             # when start_num > sqrtN
             nonprm = (pcs2start - nonprm)%prmstep     # (start_num - last multiple) pcs
