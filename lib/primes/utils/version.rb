@@ -1,6 +1,6 @@
 module Primes
   module Utils
-    VERSION = "2.7.0"
+    VERSION = "3.0.4"
   end
 end
 
