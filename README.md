@@ -2,13 +2,15 @@
 
 ## Introduction
 
-`primes-utils` is a Rubygem which provides a suite of extremely fast utility methods for testing and generating primes.
+`primes-utils` is a Rubygem providing a suite of extremely fast methods for testing and generating primes.
 
 For details on the Math and Code used to implement them see:
 
 `PRIMES-UTILS HANDBOOK`
 
-Now available and `FREE` to view and download at:
+Available for `FREE` to read|download at:
+
+https://www.academia.edu/19786419/PRIMES_UTILS_HANDBOOK
 
 https://www.scribd.com/doc/266461408/Primes-Utils-Handbook
 
@@ -37,64 +39,62 @@ Then require as:
 
 **prime?**
 
-Determine if the absolute value of an integer is prime.  Return 'true' or 'false'.
+Determine if an integer value is prime.  Return 'true' or 'false'.
 This replaces the `prime?` method  in the `prime.rb` standard library.
+Uses PGT residues tests, then Miller-Rabin test using `primemr?`.
 
 ```
 101.prime? => true
 100.prime? => false
--71.prime? => true
+-71.prime? => false
 0.prime? => false
 1.prime? => false
 ```
 
-**primemr?(k=20)**
+**primemr?(k=5)**
 
-Using Miller-Rabin primality test for integers, return 'true' or 'false'.
-Miller-Rabin [6] is super fast, but probabilistic (not deterministic), primality test.
-The reliability can be increased by increasing the default input parameter of k=20.
+Optimized deterministic (over 64-bits) implementation of Miller-Rabin algorithm.  
+Default non-deterministic reliability set at k = 5, set higher if desired for very large numbers > 64-bts.
 
 ```
-1111111111111111111.primemr? => true
-1111111111111111111.primemr? 50  => true
-1111111111111111111.primemr?(50) => true
-11111111111111111111.primemr? => false
--3333333333333333333.primemr? => false
-n=10**1700; (n+469).primemr? => true
-0.primemr? => false
-1.primemr? => false
+n.prime?(6)
 ```
 
-**factors(p=13) or prime_division(p=13)**
+**factors or prime_division**
 
-Determine the prime factorization of the absolute value of an integer.
+Determine the prime factorization of an +|- integer value.
+Uses Unix coreutils function `factors` if available.
 This replaces the `prime_division` method in the `prime.rb` standard library.
-Output is array of arrays of factors and exponents: [[p1,e1],[p2,e2]..[pn,en]].
-Default Strictly Prime (SP) Prime Generator (PG) used here is P13.
-Can change SP PG used on input. Acceptable primes range: [3 - 19].
+Multiplying the factors back will produce original number.
+Output is array of tuples of factors and exponents elements: [[p1, e1], [p2, e2],..,[pn, en]].
 
 ```
 1111111111111111111.prime_division => [[1111111111111111111, 1]]
-11111111111111111111.prime_division  => [[11, 1], [41, 1], [101, 1], [271, 1], [3541, 1], [9091, 1], [27961, 1]]
+11111111111111111111.prime_division => [[11, 1], [41, 1], [101, 1], [271, 1], [3541, 1], [9091, 1], [27961, 1]]
 123456789.factors => [[3, 2], [3607, 1], [3803, 1]]
-123456789.factors 17 => [[3, 2], [3607, 1], [3803, 1]]
-123456789.factors(17) => [[3, 2], [3607, 1], [3803, 1]]
--12345678.factors => [[2, 1], [3, 2], [47, 1], [14593, 1]]
+-12345678.factors => [[-1, 1], [2, 1], [3, 2], [47, 1], [14593, 1]]
 0.factors => []
 1.factors => []
 ```
 
-**primes(start=0), primesf(start=0), primesmr(start=0)**
+**factors1**
 
-Return an array of primes within the absolute value range `(|start| - |end|)`.
-The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`.
-If only one parameter used, then all the primes up to that number will be returned.
+Pure Ruby version equivalent of `factor`.
+Not as fast as `factor` for some values with multiple large prime factors.
+Always available if OS doesn't have `factor`
+
+**primes(start=0), primesmr(start=0)**
+
+Return an array of prime values within the inclusive integers range `[start_num - end_num]`.
+Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.
+A single input is taken as `end_num`, and the primes <= to it are returned. 
+`primes` is generally faster, and uses SSoZ to compute the range primes.
+`primesmr` is slower, but isn't memory limited, especially for very large numbers|ranges.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
 
 ```
 50.primes => [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
-50.primesf 125 => [53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113]
 300.primes 250 => [251, 257, 263, 269, 271, 277, 281, 283, 293]
 n=10**100; (n-250).primesmr(n+250) => []
 541.primes.size => 100
@@ -102,19 +102,18 @@ n=10**100; (n-250).primesmr(n+250) => []
 (prms = 1000000.primes(1000100)).size => 6
 prms.size => 6
 prms => [1000003, 1000033, 1000037, 1000039, 1000081, 1000099]
--10.primes -50  => [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
-n=10**20; n.primes n+n  -> ERROR1: range size too big for available memory. => nil
-n=10**20; n.primes 100  -> ERROR2: end_num too big for available memory. => nil
-n=10**8;  (25*n).primes -> ERROR3: not enough memory to store all primes in output array. => nil
-0.primesf  => []
-1.primesmr => []
+101.primes 101 => [101]
+1.primes   => []
+0.primesmr => []
 ```
 
-**primescnt(start=0), primescntf(start=0), primescntmr(start=0)**
+**primescnt(start=0), primescntmr(start=0)**
 
-Provide count of primes within the absolute value range `(|start| - |end|)`.
-The order of the range doesn't matter if both given: `start.primes end  <=> end.prime start`.
-If only one parameter used, the count of all the primes up to that number will be returned.
+Provide count of primes within the inclusive integers range `[start_num - end_num]`.
+Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.
+A single input is taken as `end_num`, and the primes count <= to it are returned.
+`primescnt` is faster; uses SSoZ to identify|count primes from closest hashed value starting point.
+`primescntmr` is slower, but isn't memory limited, especially for very large numbers|ranges.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
 
@@ -122,77 +121,99 @@ Also see `Error Handling`.
 100001.primescnt => 9592
 100002.primescnt => 9592
 100003.primescnt => 9593
-100000.primescntf 100500 => 40
+100000.primescntmr 100500 => 40
 n=10**400; (n-500).primescntmr(n+500) => 1
--10.primescnt -50  => 11
-n=10**20; n.primescnt n+n -> ERROR1: range size too big for available memory. => nil
-n=10**20; n.primescnt 100 -> ERROR2: end_num too big for available memory. => nil
 n=10**8; (25*n).primescnt => 121443371
-0.primescntf  => 0
+0.primescnt   => 0
 1.primescntmr => 0
 ```
 
-**primenth(p=7) or nthprime(p=7)**
+**primenth(p=0) or nthprime(p=0)**
 
-Return the value of the (absolute value of) nth prime.
+Return value of the nth prime.
 Default Strictly Prime (SP) Prime Generator (PG) is adaptively selected.
-Can change SP PG used on input. Acceptable primes range: [3 - 13].
-Indexed nth primes now upto 2.01 billionth.
+Can change SP PG used on input. Acceptable primes range: [5, 7].
+Indexed nth primes now up to 7 billionth.
+With 16GB mem can compute up to about 35.7+ billionth prime (using `bitarray`).
+Returns `nil` for negative nth inputs.
 Also see `Error Handling`.
 
 ```
 1000000.primenth => 15485863
 1500000.nthprime => 23879519
 2000000.nthprime 11 => 32452843
--500000.nthprime => 7368787
 1122951705.nthprime => 25741879847
-n = 10**11; n.primenth -> ERROR1: range size too big for available memory. => nil
-0.nthprime => 0
-1.primenth => 2
+n = 10**11; n.primenth -> #<NoMemoryError: failed to allocate memory>
+2_123_409_000.nthprime => 50092535639
+4_762_719_305.nthprime => 116378528093
+1.primenth  => 2
+0.nthprime  => nil
+-1.nthprime => nil
+```
+**next_prime**
+
+Return value of next prime > n. Returns `nil` for negative inputs.
+
+```
+100.next_prime => 101
+101.next_prime => 103
+0.next_prime   => 2
+-1.next_prime  => nil
+```
+
+**prev_prime**
+
+Return value of previous prime < n > 2. Returns `nil` for n < 2 (and negatives)
+
+```
+102.pref_prime => 101
+101.prev_prime => 97
+3.prev_prime   => 2
+2.prev_prime   => nil
+-1.prev_prime  => nil 
 ```
 
 **primes_utils**
 
-Displays a list of all the `primes-utils` methods available for your system.
-Use as `n.primes_utils` where n is any `class Integer` value.
+Displays a list of all the `primes-utils` methods available for a system.
+Use as eg: `0.primes_utils` where input n is any `class Integer` value.
+
+Available methods for 3.0.0.
 
 ```
-0.primes_utils => "prime? primemr? primes primesf primesmr primescnt primescntf primescntmr primenth|nthprime factors|prime_division primes_utils"
+0.primes_utils => "prime? primes primesmr primescnt primescntmr primenth|nthprime factors|prime_division factors1 next_prime prev_prime primes_utils"
 ```
 
 ## Error Handling
-Starting with 2.2.0, error handling has been implemented to gracefully fail when array creation requires more memory than available.
-This occurs when the range size, or end_num, need arrays greater than the amount of avalable memory. The first case shows the message
-`ERROR1: range size too big for available memory.` and the second case `ERROR2: end_num too big for available memory.`
-The affected methods are `primes`, `primescnt`, and `nthprime|primenth`.
-`nthprime|primenth` also displays the error message `<pcnt> not enough primes, approx nth too small.`
-(`<pcnt>` is computed count of primes) when the computed approx_nth value is < nth value (though this should never happen by design).
-With 2.4.0 error handling was added to `primes` that catches the error and displays message `ERROR3: not enough memory to store all primes in output array.`.
-For all errors, the return value for each method is `nil`.
+With 3.0.0 the Rubygem `bitarray` is used to extend useable memory for `primes`, `primescnt`, and `nthprime`.
+They use private method `sozcores2` to compute the SoZ over the ranges, and returns an array of prime residues positions.
+If an input range exceeds system memory to create the array, it switches to using a `bitarray`.  
+This greatly extends the computable range sizes, at the expense of being slower than using system memory.
 
 There is also the rare possibility you could get a `NoMemoryError: failed to allocate memory` for the methods 
-`primesf` and `primesmr` if their list of numerated primes is bigger than the amount of available system memory needed to store them. 
+`primes|primesmr` if their list of numerated primes is bigger than the amount of available system memory needed to store them. 
 If those methods are used as designed these errors won't occur, so the extra code isn't justified for them.
 If they occur you will know why now.
 
 This behavior is referenced to MRI Ruby.
 
 ## Coding Implementations
-The methods `primemr?`, `nthprime|primenth`, `primes`, `primescnt`, `primesmr`, and `primescnt` are coded in pure ruby.
-The methods `prime?` and `prime_division|factors` have two implementations.
-Each has a pure ruby implementation, and a hybrid implementation using the Unix cli command `factor` if its available on the host OS. 
-The methods `primesf` and `primescntf` use the `factor` version of `prime?` and are created if it exits.
-`factor` [5] is an extremely fast C coded factoring algorithm, part of the GNU Core Utilities package [4].
+The method `prime_division|factors` has 2 implementations. A pure ruby implementation, and a hybrid implementation 
+using the Unix cli command `factor` [5], if available on the host OS. It's an extremely fast C coded factoring algorithm, 
+part of the GNU Core Utilities package [4].
 
 Upon loading, the gem tests if the command `factor` exists on the host OS.
-If so, it performs a system call to it within `prime?` and `prime_division|factors`, which uses its output.
+If so, it performs a system call to it within `prime_division|factors`, and Ruby reformats its output.
 If not, each method uses a fast pure ruby implementation based on the Sieve of Zakiya (SoZ)[1][2][3].
-New in 2.2.0, upon loading with Ruby 1.8 `require 'rubygems'` is invoked to enable installing gems.
 
-All the `primes-utils` methods are `instance_methods` for `class Integer`.
+In 3.0.0, YJIT is enabled on install; and the methods coding is optimized for Ruby >= 3.3.
+
+All the `primes-utils` methods are `instance_methods` for `Class Integer`.
 
 ## History
 ```
+3.0.4 – YJIT enabled for Ruby >= 3.3, added new methods: next_prime, prev_prime.
+        Uses 'bitarray' to extend memory use for methods 'nthprime', 'primes', and 'primescnt'.
 2.7.0 – more tweaking adaptive pg selection ranges in select_pg; coded using between? instead of cover?
 2.6.0 – much, much better adaptive pg selection algorithm used in select_pg
 2.5.1 – corrected minor error in select_pg
@@ -207,7 +228,7 @@ All the `primes-utils` methods are `instance_methods` for `class Integer`.
         significantly faster resulting from sozcore2 changes; massive code cleanups all-arround; added
         private methods select_pg (to adaptively select the pg used in primes), and array_check (used in
         sozcore2 to catch array creation out-of-memory errors)
-2.3.0 – primescnt now finds primes upto some integer much faster, and for much larger integers
+2.3.0 – primescnt now finds primes up to some integer much faster, and for much larger integers
         increased index nth primes to over 2 billionth; used in nthprime|primenth and primescnt
 2.2.0 – for sozcore2: refactored to include more common code; changed output api; added memory
         error messages when prms and prms_range arrays creation fails; for primenth: used new
@@ -227,17 +248,19 @@ All the `primes-utils` methods are `instance_methods` for `class Integer`.
 1.0.1 – check if using Ruby 1.8 at start, if so, require 'rational' library for gcd method
 1.0.0 – initial release April 1, 2015 with methods prime?, primemr?, primes, prime_division|factors, primenth|nthprime
 ```
-
 ## Author
 Jabari Zakiya
 
 ## References
-[1]https://www.scribd.com/doc/150217723/Improved-Primality-Testing-and-Factorization-in-Ruby-revised
-[2]https://www.scribd.com/doc/228155369/The-Segmented-Sieve-of-Zakiya-SSoZ
-[3]https://www.scribd.com/doc/73385696/The-Sieve-of-Zakiya
-[4]https://en.wikipedia.org/wiki/GNU_Core_Utilities
-[5]https://en.wikipedia.org/wiki/Factor_(Unix)
-[6]https://en.wikipedia.org/wiki/Miller-Rabin_primality_test
+[1] https://www.scribd.com/doc/150217723/Improved-Primality-Testing-and-Factorization-in-Ruby-revised   
+[2] https://www.scribd.com/doc/228155369/The-Segmented-Sieve-of-Zakiya-SSoZ   
+[3] https://www.scribd.com/doc/73385696/The-Sieve-of-Zakiya   
+[4] https://en.wikipedia.org/wiki/GNU_Core_Utilities   
+[5] https://en.wikipedia.org/wiki/Factor_(Unix)   
+[6] https://en.wikipedia.org/wiki/Miller-Rabin_primality_test   
+[7] https://www.academia.edu/105821370/Twin_Primes_Segmented_Sieve_of_Zakiya_SSoZ_Explained_Review_Article
 
 ## License
+LGPL-2.0-or-later
+ense
 GPLv2+
