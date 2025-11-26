@@ -36,7 +36,7 @@ Then require as:
 
 **prime?**
 
-Determine if an integer value is prime.  Return 'true' or 'false'.
+Determine if an integer value is prime.  Return `true` or `false`.
 This replaces the `prime?` method  in the `prime.rb` standard library.
 Uses PGT residues tests, then Miller-Rabin test using `primemr?`.
 
@@ -92,7 +92,7 @@ Also see `Error Handling`.
 
 ```
 50.primes => [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
-300.primes 250 => [251, 257, 263, 269, 271, 277, 281, 283, 293]
+300.primesmr 250 => [251, 257, 263, 269, 271, 277, 281, 283, 293]
 n=10**100; (n-250).primesmr(n+250) => []
 541.primes.size => 100
 1000.primes(5000).size => 501
