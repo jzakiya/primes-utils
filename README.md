@@ -88,7 +88,7 @@ Always available if OS doesn't have `factor`
 Return an array of prime values within the inclusive integers range `[start_num - end_num]`.
 Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.
 A single input is taken as `end_num`, and the primes <= to it are returned. 
-`primes` is generally faster, and uses SSoZ to compute the range primes.
+`primes` is generally faster, and uses SoZ to compute the range primes.
 `primesmr` is slower, but isn't memory limited, especially for very large numbers|ranges.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
@@ -262,5 +262,3 @@ Jabari Zakiya
 
 ## License
 LGPL-2.0-or-later
-ense
-GPLv2+
