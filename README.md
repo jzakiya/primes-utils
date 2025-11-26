@@ -60,7 +60,7 @@ n.prime?(6)
 **factors or prime_division**
 
 Determine the prime factorization of an +|- integer value.  
-Uses Unix coreutils function `factors` if available.  
+Uses Unix coreutils function `factor` if available.  
 This replaces the `prime_division` method in the `prime.rb` standard library.  
 Multiplying the factors back will produce original number.  
 Output is array of tuples of factors and exponents elements: [[p1, e1], [p2, e2],..,[pn, en]].
