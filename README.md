@@ -127,13 +127,12 @@ n=10**8; (25*n).primescnt => 121443371
 
 **primenth(p=0) or nthprime(p=0)**
 
-Return value of the nth prime.
-Default Strictly Prime (SP) Prime Generator (PG) is adaptively selected.
-Can change SP PG used on input. Acceptable primes range: [5, 7].
-Indexed nth primes now up to 7 billionth.
-With 16GB mem can compute up to about 35.7+ billionth prime (using `bitarray`).
-Returns `nil` for negative nth inputs.
-Also see `Error Handling`.
+Return value of the nth prime.  
+Default Strictly Prime (SP) Prime Generator (PG) is adaptively selected.  
+Can change SP PG used on input. Acceptable primes range: [5, 7].  
+Indexed nth primes now up to 7 billionth.  
+With 16GB mem can compute up to about 35.7+ billionth prime (using `bitarray`).  
+Returns `nil` for negative nth inputs. Also see `Error Handling`.
 
 ```
 1000000.primenth => 15485863
@@ -143,6 +142,7 @@ Also see `Error Handling`.
 n = 10**11; n.primenth -> #<NoMemoryError: failed to allocate memory>
 2_123_409_000.nthprime => 50092535639
 4_762_719_305.nthprime => 116378528093
+7_123_456_789.nthprime => 177058934933
 1.primenth  => 2
 0.nthprime  => nil
 -1.nthprime => nil
