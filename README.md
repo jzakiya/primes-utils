@@ -12,9 +12,6 @@ Available for `FREE` to read|download at:
 
 https://www.academia.edu/19786419/PRIMES_UTILS_HANDBOOK
 
-https://www.scribd.com/doc/266461408/Primes-Utils-Handbook
-
-
 ## Installation
 
 Add this line to your application's Gemfile:
