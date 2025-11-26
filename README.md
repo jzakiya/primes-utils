@@ -109,7 +109,7 @@ prms => [1000003, 1000033, 1000037, 1000039, 1000081, 1000099]
 Provide count of primes within the inclusive integers range `[start_num - end_num]`.
 Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.
 A single input is taken as `end_num`, and the primes count <= to it are returned.
-`primescnt` is faster; uses SSoZ to identify|count primes from closest hashed value starting point.
+`primescnt` is faster; uses SoZ to identify|count primes from closest hashed value starting point.
 `primescntmr` is slower, but isn't memory limited, especially for very large numbers|ranges.
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
