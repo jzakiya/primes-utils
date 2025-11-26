@@ -36,8 +36,8 @@ Then require as:
 
 **prime?**
 
-Determine if an integer value is prime.  Return `true` or `false`.
-This replaces the `prime?` method  in the `prime.rb` standard library.
+Determine if an integer value is prime, and return `true` or `false`.  
+This replaces the `prime?` method  in the `prime.rb` standard library.  
 Uses PGT residues tests, then Miller-Rabin test using `primemr?`.
 
 ```
@@ -50,7 +50,7 @@ Uses PGT residues tests, then Miller-Rabin test using `primemr?`.
 
 **primemr?(k=5)**
 
-Optimized deterministic (over 64-bits) implementation of Miller-Rabin algorithm.  
+Optimized deterministic (over 64-bits) implementation of Miller-Rabin algorithm.      
 Default non-deterministic reliability set at k = 5, set higher if desired for very large numbers > 64-bts.
 
 ```
@@ -59,10 +59,10 @@ n.prime?(6)
 
 **factors or prime_division**
 
-Determine the prime factorization of an +|- integer value.
-Uses Unix coreutils function `factors` if available.
-This replaces the `prime_division` method in the `prime.rb` standard library.
-Multiplying the factors back will produce original number.
+Determine the prime factorization of an +|- integer value.  
+Uses Unix coreutils function `factors` if available.  
+This replaces the `prime_division` method in the `prime.rb` standard library.  
+Multiplying the factors back will produce original number.  
 Output is array of tuples of factors and exponents elements: [[p1, e1], [p2, e2],..,[pn, en]].
 
 ```
@@ -76,18 +76,18 @@ Output is array of tuples of factors and exponents elements: [[p1, e1], [p2, e2]
 
 **factors1**
 
-Pure Ruby version equivalent of `factor`.
-Not as fast as `factor` for some values with multiple large prime factors.
+Pure Ruby version equivalent of `factor`.  
+Not as fast as `factor` for some values with multiple large prime factors.  
 Always available if OS doesn't have `factor`
 
 **primes(start=0), primesmr(start=0)**
 
-Return an array of prime values within the inclusive integers range `[start_num - end_num]`.
-Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.
-A single input is taken as `end_num`, and the primes <= to it are returned. 
-`primes` is generally faster, and uses SoZ to compute the range primes.
-`primesmr` is slower, but isn't memory limited, especially for very large numbers|ranges.
-See `PRIMES-UTILS HANDBOOK` for details on best use practices.
+Return an array of prime values within the inclusive integers range `[start_num - end_num]`.  
+Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.  
+A single input is taken as `end_num`, and the primes <= to it are returned.   
+`primes` is generally faster, and uses SoZ to compute the range primes.  
+`primesmr` is slower, but isn't memory limited, especially for very large numbers|ranges.  
+See `PRIMES-UTILS HANDBOOK` for details on best use practices.  
 Also see `Error Handling`.
 
 ```
@@ -106,11 +106,11 @@ prms => [1000003, 1000033, 1000037, 1000039, 1000081, 1000099]
 
 **primescnt(start=0), primescntmr(start=0)**
 
-Provide count of primes within the inclusive integers range `[start_num - end_num]`.
-Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.
-A single input is taken as `end_num`, and the primes count <= to it are returned.
-`primescnt` is faster; uses SoZ to identify|count primes from closest hashed value starting point.
-`primescntmr` is slower, but isn't memory limited, especially for very large numbers|ranges.
+Provide count of primes within the inclusive integers range `[start_num - end_num]`.  
+Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.  
+A single input is taken as `end_num`, and the primes count <= to it are returned.  
+`primescnt` is faster; uses SoZ to identify|count primes from closest hashed value starting point.  
+`primescntmr` is slower, but isn't memory limited, especially for very large numbers|ranges.  
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
 
@@ -172,7 +172,7 @@ Return value of previous prime < n > 2. Returns `nil` for n < 2 (and negatives)
 
 **primes_utils**
 
-Displays a list of all the `primes-utils` methods available for a system.
+Displays a list of all the `primes-utils` methods available for a system.  
 Use as eg: `0.primes_utils` where input n is any `class Integer` value.
 
 Available methods for 3.0.0.
@@ -184,7 +184,7 @@ Available methods for 3.0.0.
 ## Error Handling
 With 3.0.0 the Rubygem `bitarray` is used to extend useable memory for `primes`, `primescnt`, and `nthprime`.
 They use private method `sozcores2` to compute the SoZ over the ranges, and returns an array of prime residues positions.
-If an input range exceeds system memory to create the array, it switches to using a `bitarray`.  
+If an input range exceeds system memory to create the array, it switches to using a `bitarray`.
 This greatly extends the computable range sizes, at the expense of being slower than using system memory.
 
 There is also the rare possibility you could get a `NoMemoryError: failed to allocate memory` for the methods 
