@@ -76,9 +76,9 @@ Output is array of tuples of factors and exponents elements: [[p1, e1], [p2, e2]
 
 **factors1**
 
-Pure Ruby version equivalent of `factor`.  
-Not as fast as `factor` for some values with multiple large prime factors.  
-Always available if OS doesn't have `factor`
+Pure Ruby version equivalent of `factors`.  
+Not as fast as `factors` for some values with multiple large prime factors.  
+Always available if OS doesn't have coreutils `factor`.
 
 **primes(start=0), primesmr(start=0)**
 
