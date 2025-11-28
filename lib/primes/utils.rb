@@ -64,8 +64,8 @@ module Primes
     # Adaptively selects best SP PG, unless valid input PG given at runtime
     def primenth(p = 0)
       return nil if (n = self) < 1
-      seeds = [2, 3, 5, 7, 11, 13]
-      return n > 0 ? seeds[n - 1] : 0 if n <= seeds.size
+      seeds = PRIMES
+      return seeds[n - 1] if n <= seeds.size
 
       start_num, nth, nthflag = set_start_value(n, true)
       return start_num if nthflag      # output nthprime value if n a ref prime key
@@ -326,7 +326,7 @@ module Primes
     def sozcore2(end_num, start_num, modpg)
       residues = make_residues(modpg); rescnt = residues.size     
       maxpcs, pcs2start, rs, modks, pcs_range = pcs_to_nums(end_num, start_num, residues)
-      sqrtN = Integer.sqrt(end_num)
+      sqrtN, inputs_range = Integer.sqrt(end_num), end_num - start_num
       pcs2sqrtN, _ = pcs_to_nums(sqrtN, 0, residues) # num pcs <= sqrtN
 
       m = pcs2start        # index to start retrieving primes in prms array
@@ -346,7 +346,7 @@ module Primes
         prm_r = residues[i % rescnt]        # save its residue value
         prime = modpg*(k=i/rescnt)+prm_r    # numerate its value; set k resgroup value
         rem = start_num % prime             # prime's distance to start_num
-        next unless (prime - rem <= end_num - start_num) || rem == 0 # skip prime mults not in range
+        next unless (prime - rem <= inputs_range) || rem == 0 # skip prime mults not in range
         prmstep = prime * rescnt            # compute its primestep
         residues.each do |ri|               # find|mark its multiples
           # convert (prime * (modk + ri)) pc value to its address in prms
