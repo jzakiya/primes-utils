@@ -367,6 +367,32 @@ module Primes
       a = b * Math.log(log_n = Math.log(n))
       (n * (log_n + a) + 3).to_i
     end
+        
+    def select_pg(end_num, start_num)       # adaptively select PG
+      range = end_num - start_num
+      pg = 5
+      if start_num <= Integer.sqrt(end_num) # for one array of primes upto N
+        pg =  7 if end_num >  50 * 10**4
+        pg = 11 if end_num > 305 * 10**5
+      else                                  # for split array cases
+        pg =  7 if (range.between?(10**6, 10**7 - 1) && start_num < 10**8)       ||
+                   (range.between?(10**7, 10**8 - 1) && start_num < 46 * 10**8)  ||
+                   (range.between?(10**8, 10**9 - 1) && start_num < 16 * 10**10) ||
+                   (range >= 10**9 && start_num < 26 * 10**12)
+        pg = 11 if (range.between?(10**8, 10**9 - 1) && start_num < 55 * 10**7)  ||
+                   (range >= 10**9 && start_num < 45 * 10**9)
+      end
+      primes = [2, 3, 5, 7, 11, 13].select! { |p| p <= pg }
+      [primes, primes.reduce(:*)]           # [base primes, mod] for PG
+    end
+
+    def array_check(len)                    # for out-of-memory errors on primes array creation
+      begin
+        Array.new(len, 0)                   # use Array when enough mem for given length
+      rescue Exception
+        return BitArray.new(len)            # use BitArray when memory-error for Array
+      end 
+    end
 
     # Find largest index nthprime|val <= n; return [start_num, nth, f/t]
     def set_start_value(n, hshflag)
@@ -488,31 +514,6 @@ module Primes
          6_625_000_000 =>164_167_763_329, 6_750_000_000 => 167_397_013_051,
          6_875_000_000 =>170_628_613_009, 7_000_000_000 => 173_862_636_221 }
     end
-
-    def select_pg(end_num, start_num)       # adaptively select PG
-      range = end_num - start_num
-      pg = 5
-      if start_num <= Integer.sqrt(end_num) # for one array of primes upto N
-        pg =  7 if end_num >  50 * 10**4
-        pg = 11 if end_num > 305 * 10**5
-      else                                  # for split array cases
-        pg =  7 if (range.between?(10**6, 10**7 - 1) && start_num < 10**8)       ||
-                   (range.between?(10**7, 10**8 - 1) && start_num < 46 * 10**8)  ||
-                   (range.between?(10**8, 10**9 - 1) && start_num < 16 * 10**10) ||
-                   (range >= 10**9 && start_num < 26 * 10**12)
-        pg = 11 if (range.between?(10**8, 10**9 - 1) && start_num < 55 * 10**7)  ||
-                   (range >= 10**9 && start_num < 45 * 10**9)
-      end
-      primes = [2, 3, 5, 7, 11, 13].select! { |p| p <= pg }
-      [primes, primes.reduce(:*)]           # [base primes, mod] for PG
-    end
-
-    def array_check(len)                    # for out-of-memory errors on primes array creation
-      begin
-        Array.new(len, 0)                   # use Array when enough mem for given length
-      rescue Exception
-        return BitArray.new(len)            # use BitArray when memory-error for Array
-    end end
   end
 end
 
