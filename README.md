@@ -130,7 +130,7 @@ Return value of the nth prime.
 Default Strictly Prime (SP) Prime Generator (PG) is adaptively selected.  
 Can change SP PG used on input. Default is 7. (Usable are 5, 7, 11, but normally just use default.)   
 Indexed nth primes now up to 7 billionth.  
-With 16GB mem can compute up to about 35.7+ billionth prime (using `bitarray`).  
+With 16GB mem can compute up to about 30.7+ billionth prime (using `bitarray`).  
 Returns `nil` for negative nth inputs. Also see `Error Handling`.
 
 ```
@@ -208,7 +208,7 @@ All the `primes-utils` methods are `instance_methods` for `Class Integer`.
 
 ## History
 ```
-3.0.4 – YJIT enabled for Ruby >= 3.3, added new methods: next_prime, prev_prime.
+3.0.5 – YJIT enabled for Ruby >= 3.3, added new methods: next_prime, prev_prime.
         Uses 'bitarray' to extend memory use for methods 'nthprime', 'primes', and 'primescnt'.
 2.7.0 – more tweaking adaptive pg selection ranges in select_pg; coded using between? instead of cover?
 2.6.0 – much, much better adaptive pg selection algorithm used in select_pg
