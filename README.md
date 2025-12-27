@@ -110,6 +110,7 @@ Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num
 A single input is taken as `end_num`, and the primes count <= to it are returned.  
 `primescnt` is faster; uses SoZ to identify|count primes from closest hashed value starting point.  
 `primescntmr` is slower, but isn't memory limited, especially for very large numbers|ranges.  
+Can also perform effective primality test on an integer n as: `n.primescntmr n`   
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
 
@@ -122,6 +123,8 @@ n=10**400; (n-500).primescntmr(n+500) => 1
 n=10**8; (25*n).primescnt => 121443371
 0.primescnt   => 0
 1.primescntmr => 0
+100.primescntmr 100 => 0
+101.primescntmr 101 => 1
 ```
 
 **primenth(p=0) or nthprime(p=0)**
@@ -208,6 +211,9 @@ All the `primes-utils` methods are `instance_methods` for `Class Integer`.
 
 ## History
 ```
+3.1.0 – major performance enhancements for methods primescnt, primescntmr, and nthprimes,
+        primarily by extending nth primes hash values up to 10.1 billion. Can now find nth primes
+        over ranges up to 10.1 billion, and thus prime counts up to 253+ billion, in < 30 secs at ~5Ghz.
 3.0.5 – YJIT enabled for Ruby >= 3.3, added new methods: next_prime, prev_prime.
         Uses 'bitarray' to extend memory use for methods 'nthprime', 'primes', and 'primescnt'.
 2.7.0 – more tweaking adaptive pg selection ranges in select_pg; coded using between? instead of cover?
@@ -258,3 +264,4 @@ Jabari Zakiya
 
 ## License
 LGPL-2.0-or-later
+
