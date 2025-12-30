@@ -112,7 +112,7 @@ module Primes
     def primescnt(start_num = 0)
       end_num, start_num = check_inputs(self, start_num)
 
-      nthflag, nth = 0, 0
+      nthflag, nth = nil, 0
       if start_num < 3                 # for all primes upto num
         start_num, nth, nthflag = set_start_value(end_num, false) # closest nth value
         return nth unless nthflag      # output num's key|count if ref nth value
@@ -149,7 +149,7 @@ module Primes
     def primescntmr(start_num = 0)
       end_num, start_num = check_inputs(self, start_num)
 
-      nthflag, nth = 0, 0
+      nthflag, nth = nil, 0
       if start_num < 3                 # for all primes upto num
         start_num, nth, nthflag = set_start_value(end_num, false) # closest nth value
         return nth unless nthflag      # output num's key|count if ref nth value
@@ -271,26 +271,20 @@ module Primes
       residues.sort << (modpg - 1) << (modpg + 1)
     end
 
-    # Determine number of pcs upto the effective start, end, and range width.
+    # Determine number of pcs upto the effective start|end vals; w/flag
     # The effective start_num is first pc >= start_num, first pc <= end_num,
     # and effective range is number of pcs between them (inclusive).
-    # inputs:  end_num and start_num of range, and PGs residues array
-    # outputs: pcs_to_end   - number of pcs in <= end_num pc for PG
-    #          pcs_to_start - number of pcs < effective start_num pc for range
-    #          r1           - residue index for effective start_num pc
-    #          modk1        - mod resgroup value for effective start_num pc
-    #          pcs_in_range - total number of pcs in effective range
-    def pcs_to_nums(end_num, start_num, residues)
+    # inputs:  end_num|start_num of range, PGs residues array, start:t|end:f flag
+    # outputs: pcs_to_num   - number of pcs < start_num or <= end_num
+    #          r            - residue index for effective start_num pc
+    #          modk         - mod resgroup value for effective num value
+    def pcs_to_num(num, residues, flag)
+      return [0, 0, 0] if num < residues[0]
       modpg, rescnt = residues[-1] - 1, residues.size
-      end_num   = 2 if end_num   < residues[0]
-      start_num = 2 if start_num < residues[0]
-      start_num -= 1; k1 = (start_num - 1)/modpg; modk1 = modpg * k1
-      end_num   -= 1; k2 = (end_num |= 1 )/modpg; modk2 = modpg * k2
-      r1 = 0; r1 = r1.succ while start_num >= modk1 + residues[r1]
-      r2 = 0; r2 = r2.succ while end_num   >= modk2 + residues[r2]
-      pcs_to_end = k2 * rescnt + r2; pcs_to_start = k1 * rescnt + r1
-      pcs_in_range = pcs_to_end - pcs_to_start
-      [pcs_to_end, pcs_to_start, r1, modk1, pcs_in_range]
+      val1, val2  = flag ? [num-2, num-1] : [(num-1)|1, (num-1)|1]
+      k = val1 / modpg; modk = k * modpg; r = 0; resk = val2 - modk
+      r = r.succ while resk >= residues[r]; pcs_to_num = k * rescnt + r
+      [pcs_to_num, r, modk]
     end
 
     # Select SP Prime Generator to parametize the pcs within inputs range
@@ -301,16 +295,14 @@ module Primes
     #          primes   - array of modulus primes in range, if any
     def sozcore1(end_num, start_num)
       range = end_num - start_num
-      modpg = if    range <    100_001;       210  #  P7; Math.isqrt(10_000_200_001)
-              elsif range <  7_071_267;    30_030  # P13; Math.isqrt(50_002_816_985_289)
-              elsif range < 24_494_897;   510_510  # P17; Math.isqrt(600_000_000_000_000)
+      modpg = if    range <    100_001;       210  #  P7; Isqrt(10_000_200_001)
+              elsif range <  7_071_267;    30_030  # P13; Isqrt(50_002_816_985_289)
+              elsif range < 24_494_897;   510_510  # P17; Isqrt(600_000_000_000_000)
               else                      9_699_690  # P19
               end
       residues = make_residues(modpg)       # chosen PG residues
       primes = PRIMES.select { |p| p < residues[0] && p.between?(start_num, end_num) }
-      start_num = 2 if start_num < residues[0]
-      k = (start_num - 2) / modpg; modk = k * modpg; r = 0
-      while (start_num - 1) >= modk + residues[r]; r = r.succ end
+      _, r, modk = pcs_to_num(start_num, residues, true)
       [r, modk, residues, primes]
     end
 
@@ -323,10 +315,12 @@ module Primes
     #          pcs2start- number of pcs < start_num pc
     #          rs       - residue index location for first pc >= start_num
     def sozcore2(end_num, start_num, modpg)
-      residues = make_residues(modpg); rescnt = residues.size     
-      maxpcs, pcs_to_start, rs, modks, pcs_range = pcs_to_nums(end_num, start_num, residues)
-      sqrtN, inputs_range = Integer.sqrt(end_num), end_num - start_num
-      pcs_to_sqrtN, _ = pcs_to_nums(sqrtN, 0, residues) # num pcs <= sqrtN
+      residues = make_residues(modpg)
+      rescnt, sqrtN = residues.size, Integer.sqrt(end_num)
+      pcs_to_start, rs, modks = pcs_to_num(start_num, residues, true) # num pcs <  start_num
+      maxpcs, _               = pcs_to_num(end_num, residues, false)  # num pcs <= end_num
+      pcs_to_sqrtN, _         = pcs_to_num(sqrtN, residues, false)    # num pcs <= sqrtN
+      inputs_range, pcs_range = end_num - start_num, maxpcs - pcs_to_start
 
       m = pcs_to_start                      # index to start retrieving primes in prms array
       split_arrays = (start_num > sqrtN)    # flag, true for split arrays
