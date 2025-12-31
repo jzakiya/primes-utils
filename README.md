@@ -34,32 +34,6 @@ Then require as:
 
 ## Methods
 
-**prime?**
-
-Determine if an integer value is prime, and return `true` or `false`.  
-This replaces the `prime?` method  in the `prime.rb` standard library.  
-Uses PGT residues tests, then Miller-Rabin test using `primemr?`.
-
-```
-101.prime? => true
-100.prime? => false
--71.prime? => false
-0.prime? => false
-1.prime? => false
-```
-
-**primemr?(k=5)**
-
-Optimized deterministic (to 128-bits) implementation of Miller-Rabin algorithm.  
-It's the underlying primality test for `prime?`, and used in other methods.  
-Default probabilistic reliability constant set at k = 5, set higher if desired for numbers > 128-bts.  
-Not really necessary to do though.
-
-```
-5_000_000_000_000_000_003.primemr? => true
-987_654_321_012_345_678_901_382_737.primemr? 6 => true
-987_654_321_012_345_678_901_382_739.primemr? 6 => false
-```
 
 **factors or prime_division**
 
@@ -90,7 +64,26 @@ Always available if OS doesn't have coreutils `factor`.
 987_654_321_012_345_678_901_382_739.factors1 => [[3, 1], [23, 1], [139, 1], [421, 1], [3469, 1], [7393, 1], [135899, 1], [70180703, 1]]
 ```
 
-**primes(start=0), primesmr(start=0)**
+**prime?(k=5) or primemr?(k=5)**
+
+Determine if an integer value is prime, and return `true` or `false`.  
+`prime?` replaces the `prime?` method  in the `prime.rb` standard library.  
+It uses PGT residues tests, then Miller-Rabin test using `primemr?`.  
+Default probabilistic reliability constant set at k = 5, set higher if desired for numbers > 128-bts.  
+Not really necessary to do though.
+
+```
+101.prime? => true
+100.prime? => false
+-71.prime? => false
+0.primemr? => false
+1.primemr? => false
+5_000_000_000_000_000_003.primemr? => true
+987_654_321_012_345_678_901_382_737.prime? 6 => true
+987_654_321_012_345_678_901_382_739.prime? 6 => false
+```
+
+**primes(start=0) or primesmr(start=0)**
 
 Return an array of prime values within the inclusive integers range `[start_num - end_num]`.  
 Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.  
@@ -113,7 +106,7 @@ prms => [1000003, 1000033, 1000037, 1000039, 1000081, 1000099]
 0.primesmr => []
 ```
 
-**primescnt(start=0), primescntmr(start=0)**
+**primescnt(start=0) or primescntmr(start=0)**
 
 Provide count of primes within the inclusive integers range `[start_num - end_num]`.  
 Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.  
@@ -188,7 +181,7 @@ Return value of previous prime < n > 2. Returns `nil` for n < 2 (and negatives)
 Displays a list of all the `primes-utils` methods available for a system.  
 Use as eg: `0.primes_utils` where input n is any `class Integer` value.
 
-Available methods for 3.1.1.
+Available methods for 3.1.2.
 
 ```
 0.primes_utils => "prime? primes primesmr primescnt primescntmr primenth|nthprime factors|prime_division factors1 next_prime prev_prime primes_utils"
@@ -222,6 +215,7 @@ All the `primes-utils` methods are `instance_methods` for `Class Integer`.
 
 ## History
 ```
+3.1.2 – method refactor, documentation updates
 3.1.1 – some methods refactoring|DRYing, documentation updates
 3.1.0 – major performance enhancements for methods primescnt, primescntmr, and nthprimes,
         primarily by extending nth primes hash values up to 10.1 billion. Can now find nth primes
@@ -276,3 +270,4 @@ Jabari Zakiya
 
 ## License
 LGPL-2.0-or-later
+
