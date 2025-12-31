@@ -50,11 +50,15 @@ Uses PGT residues tests, then Miller-Rabin test using `primemr?`.
 
 **primemr?(k=5)**
 
-Optimized deterministic (over 64-bits) implementation of Miller-Rabin algorithm.      
-Default non-deterministic reliability set at k = 5, set higher if desired for very large numbers > 64-bts.
+Optimized deterministic (to 128-bits) implementation of Miller-Rabin algorithm.  
+It's the underlying primality test for `prime?`, and used in other methods.  
+Default probabilistic reliability constant set at k = 5, set higher if desired for numbers > 128-bts.  
+Not really necessary to do though.
 
 ```
-n.prime?(6)
+5_000_000_000_000_000_003.primemr? => true
+987_654_321_012_345_678_901_382_737.primemr? 6 => true
+987_654_321_012_345_678_901_382_739.primemr? 6 => false
 ```
 
 **factors or prime_division**
@@ -79,6 +83,12 @@ Output is array of tuples of factors and exponents elements: [[p1, e1], [p2, e2]
 Pure Ruby version equivalent of `factors`.  
 Not as fast as `factors` for some values with multiple large prime factors.  
 Always available if OS doesn't have coreutils `factor`.
+
+```
+123_456_789.factors1 => [[3, 1], [7, 2], [839087, 1]]
+5_000_000_000_000_000_003.factors1 => [[5000000000000000003, 1]]
+987_654_321_012_345_678_901_382_739.factors1 => [[3, 1], [23, 1], [139, 1], [421, 1], [3469, 1], [7393, 1], [135899, 1], [70180703, 1]]
+```
 
 **primes(start=0), primesmr(start=0)**
 
@@ -108,9 +118,9 @@ prms => [1000003, 1000033, 1000037, 1000039, 1000081, 1000099]
 Provide count of primes within the inclusive integers range `[start_num - end_num]`.  
 Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.  
 A single input is taken as `end_num`, and the primes count <= to it are returned.  
-`primescnt` is faster; uses SoZ to identify|count primes from closest hashed value starting point.  
-`primescntmr` is slower, but isn't memory limited, especially for very large numbers|ranges.  
-Can also perform effective primality test on an integer n as: `n.primescntmr n`   
+`primescnt` is generally faster; uses SoZ to identify|count primes from closest hashed value starting point.  
+`primescntmr` is situationally slower, but isn't memory limited, especially for very large numbers|ranges.  
+Can also perform effective primality test on an integer n as: `n.primescntmr n`  
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.
 Also see `Error Handling`.
 
@@ -121,6 +131,7 @@ Also see `Error Handling`.
 100000.primescntmr 100500 => 40
 n=10**400; (n-500).primescntmr(n+500) => 1
 n=10**8; (25*n).primescnt => 121443371
+541.primescntmr 7919 => 901
 0.primescnt   => 0
 1.primescntmr => 0
 100.primescntmr 100 => 0
@@ -177,7 +188,7 @@ Return value of previous prime < n > 2. Returns `nil` for n < 2 (and negatives)
 Displays a list of all the `primes-utils` methods available for a system.  
 Use as eg: `0.primes_utils` where input n is any `class Integer` value.
 
-Available methods for 3.0.0.
+Available methods for 3.1.1.
 
 ```
 0.primes_utils => "prime? primes primesmr primescnt primescntmr primenth|nthprime factors|prime_division factors1 next_prime prev_prime primes_utils"
@@ -197,9 +208,9 @@ If they occur you will know why now.
 This behavior is referenced to MRI Ruby.
 
 ## Coding Implementations
-The method `prime_division|factors` has 2 implementations. A pure ruby implementation, and a hybrid implementation 
+The method `prime_division|factors` has 2 implementations. A pure ruby implementation `factors1`, and a hybrid implementation 
 using the Unix cli command `factor` [5], if available on the host OS. It's an extremely fast C coded factoring algorithm, 
-part of the GNU Core Utilities package [4].
+part of the GNU Core Utilities package [4]. However, `factors1` is always exists separately.
 
 Upon loading, the gem tests if the command `factor` exists on the host OS.
 If so, it performs a system call to it within `prime_division|factors`, and Ruby reformats its output.
@@ -211,6 +222,7 @@ All the `primes-utils` methods are `instance_methods` for `Class Integer`.
 
 ## History
 ```
+3.1.1 – some methods refactoring|DRYing, documentation updates
 3.1.0 – major performance enhancements for methods primescnt, primescntmr, and nthprimes,
         primarily by extending nth primes hash values up to 10.1 billion. Can now find nth primes
         over ranges up to 10.1 billion, and thus prime counts up to 253+ billion, in < 30 secs at ~5Ghz.
@@ -264,4 +276,3 @@ Jabari Zakiya
 
 ## License
 LGPL-2.0-or-later
-
