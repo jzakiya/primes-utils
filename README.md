@@ -86,10 +86,10 @@ Not really necessary to do though.
 **primes(start=0) or primesmr(start=0)**
 
 Return an array of prime values within the inclusive integers range `[start_num - end_num]`.  
-Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.  
+Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.primesmr start_num`.  
 A single input is taken as `end_num`, and the primes <= to it are returned.   
 `primes` is generally faster, and uses SoZ to compute the range primes.  
-`primesmr` is slower, but isn't memory limited, especially for very large numbers|ranges.  
+`primesmr` is sometimes faster|slower, but isn't memory limited, especially for very large numbers|ranges.  
 See `PRIMES-UTILS HANDBOOK` for details on best use practices.  
 Also see `Error Handling`.
 
@@ -109,7 +109,7 @@ prms => [1000003, 1000033, 1000037, 1000039, 1000081, 1000099]
 **primescnt(start=0) or primescntmr(start=0)**
 
 Provide count of primes within the inclusive integers range `[start_num - end_num]`.  
-Input order doesn't matter if both given: `start_num.primes end_num  <=> end_num.prime start_num`.  
+Input order doesn't matter if both given: `start_num.primescnt end_num  <=> end_num.primescntmr start_num`.  
 A single input is taken as `end_num`, and the primes count <= to it are returned.  
 `primescnt` is generally faster; uses SoZ to identify|count primes from closest hashed value starting point.  
 `primescntmr` is situationally slower, but isn't memory limited, especially for very large numbers|ranges.  
@@ -169,7 +169,7 @@ Return value of next prime > n. Returns `nil` for negative inputs.
 Return value of previous prime < n > 2. Returns `nil` for n < 2 (and negatives)
 
 ```
-102.pref_prime => 101
+102.prev_prime => 101
 101.prev_prime => 97
 3.prev_prime   => 2
 2.prev_prime   => nil
@@ -184,7 +184,7 @@ Use as eg: `0.primes_utils` where input n is any `class Integer` value.
 Available methods for 3.1.2.
 
 ```
-0.primes_utils => "prime? primes primesmr primescnt primescntmr primenth|nthprime factors|prime_division factors1 next_prime prev_prime primes_utils"
+0.primes_utils => "prime? primemr? primes primesmr primescnt primescntmr primenth|nthprime factors|prime_division factors1 next_prime prev_prime primes_utils"
 ```
 
 ## Error Handling
@@ -270,4 +270,5 @@ Jabari Zakiya
 
 ## License
 LGPL-2.0-or-later
+
 
