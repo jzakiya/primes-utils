@@ -136,7 +136,7 @@ n=10**8; (25*n).primescnt => 121443371
 Return value of the nth prime.  
 Default Strictly Prime (SP) Prime Generator (PG) is adaptively selected.  
 Can change SP PG used on input. Default is 7. (Usable are 5, 7, 11, but normally just use default.)   
-Indexed nth primes now up to 7 billionth.  
+Indexed nth primes now up to ~10.1 billionth.  
 With 16GB mem can compute up to about 30.7+ billionth prime (using `bitarray`).  
 Returns `nil` for negative nth inputs. Also see `Error Handling`.
 
