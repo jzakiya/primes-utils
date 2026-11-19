@@ -181,7 +181,7 @@ Return value of previous prime < n > 2. Returns `nil` for n < 2 (and negatives)
 Displays a list of all the `primes-utils` methods available for a system.  
 Use as eg: `0.primes_utils` where input n is any `class Integer` value.
 
-Available methods for 3.1.2.
+Available methods for 3.1.3.
 
 ```
 0.primes_utils => "prime? primemr? primes primesmr primescnt primescntmr primenth|nthprime factors|prime_division factors1 next_prime prev_prime primes_utils"
@@ -209,7 +209,7 @@ Upon loading, the gem tests if the command `factor` exists on the host OS.
 If so, it performs a system call to it within `prime_division|factors`, and Ruby reformats its output.
 If not, each method uses a fast pure ruby implementation based on the Sieve of Zakiya (SoZ)[1][2][3].
 
-In 3.0.0, YJIT is enabled on install; and the methods coding is optimized for Ruby >= 3.3.
+In >= 3.0.0, YJIT is enabled on install; and the methods coding is optimized for Ruby >= 3.3.
 
 All the `primes-utils` methods are `instance_methods` for `Class Integer`.
 
