@@ -150,8 +150,8 @@ n = 10**11; n.primenth -> #<NoMemoryError: failed to allocate memory>
 4_762_719_305.nthprime => 116378528093
 7_123_456_789.nthprime => 177058934933
 1.primenth  => 2
-0.nthprime  => nil
--1.nthprime => nil
+0.nthprime  => 0
+-1.nthprime => 0
 ```
 **next_prime**
 
@@ -161,7 +161,7 @@ Return value of next prime > n. Returns `nil` for negative inputs.
 100.next_prime => 101
 101.next_prime => 103
 0.next_prime   => 2
--1.next_prime  => nil
+-1.next_prime  => 0
 ```
 
 **prev_prime**
@@ -172,8 +172,8 @@ Return value of previous prime < n > 2. Returns `nil` for n < 2 (and negatives)
 102.prev_prime => 101
 101.prev_prime => 97
 3.prev_prime   => 2
-2.prev_prime   => nil
--1.prev_prime  => nil 
+2.prev_prime   => 0
+-1.prev_prime  => 0 
 ```
 
 **primes_utils**
@@ -215,6 +215,8 @@ All the `primes-utils` methods are `instance_methods` for `Class Integer`.
 
 ## History
 ```
+3.1.3 - nthprime|next_prime|prev_prime now return 0, instead of nil, for invalid inputs
+        factor|factors1 last line shorter code change
 3.1.2 – method refactor, documentation updates
 3.1.1 – some methods refactoring|DRYing, documentation updates
 3.1.0 – major performance enhancements for methods primescnt, primescntmr, and nthprimes,
