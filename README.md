@@ -216,7 +216,7 @@ All the `primes-utils` methods are `instance_methods` for `Class Integer`.
 ## History
 ```
 3.1.3 - nthprime|next_prime|prev_prime now return 0, instead of nil, for invalid inputs
-        factor|factors1 last line shorter code change
+        factors|factors1 last line shorter code change
 3.1.2 – method refactor, documentation updates
 3.1.1 – some methods refactoring|DRYing, documentation updates
 3.1.0 – major performance enhancements for methods primescnt, primescntmr, and nthprimes,
