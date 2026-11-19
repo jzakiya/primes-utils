@@ -25,7 +25,7 @@ module Primes
       def factors
         factors = self < 0 ? [-1] : []
         factors += `factor #{abs}`.split(' ')[1..-1].map(&:to_i)
-        factors.group_by { |prm| prm }.map { |prm, exp| [prm, exp.size] }
+        factors.tally.to_a
       end
 
       alias  prime_division  factors
@@ -52,8 +52,8 @@ module Primes
             (factors << prime; num /= prime; break) if (num % prime).zero?
             (r = r0; modk += modpg) if (r = r.succ) == rescnt
       end end end
-      factors << num if num > 1
-      factors.group_by{ |prm| prm}.map{ |prm, exp| [prm, exp.size] }
+      factors << num if num > 1             # include last prime factored value if > 1
+      factors.tally.to_a
     end
 
     # Use pure Ruby version of `factor` if not in OS.
@@ -62,7 +62,7 @@ module Primes
     # Return value of nth prime for self >= 1, or nil if self < 1
     # Adaptively selects best SP PG, unless valid input PG given at runtime
     def primenth(p = 0)
-      return nil if (n = self) < 1
+      return 0 if (n = self) < 1
       seeds = PRIMES
       return seeds[n - 1] if n <= seeds.size
 
@@ -177,7 +177,7 @@ module Primes
 
     # Returns the next prime number for self >= 0, or nil if n < 0
     def next_prime
-      return nil if (n = self) < 0                 # return nil if n negative
+      return 0 if (n = self) < 0                   # return 0 if n negative
       return (n >> 1) + 2 if n <= 2                # return 2 or 3 if n is 0|1|2
       n = n + 1 | 1                                # 1st odd number > n
       until (res = n % 6) & 0b11 == 1; n += 2 end  # n first P3 pc >= n, w/residue 1 or 5
@@ -188,7 +188,7 @@ module Primes
 
     # Returns the previous prime number < self, or nil if self <= 2
     def prev_prime
-      return nil if (n = self) <= 2                # no primes for n <= 2
+      return 0 if (n = self) <= 2                  # no primes for n <= 2
       return (n >> 1) + 1 if n <= 5                # 5|4 -> 3, 3 -> 2
       n = n - 2 | 1                                # 1st odd number < n
       until (res = n % 6) & 0b11 == 1; n -= 2 end  # n first P3 pc <= n, w/residue 1 or 5
@@ -617,6 +617,4 @@ end
 
 class Integer; include Primes::Utils end
 
-puts "Available methods are: #{0.primes_utils}" # display methods upon loading
-
-puts "Available methods are: #{0.primes_utils}" # display methods upon loading
+puts "Available methods are: #{0.primes_utils}" # display methods upon loadig
